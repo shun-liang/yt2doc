@@ -18,7 +18,7 @@ class YtVideoInfo:
     video_id: str
     title: str
     audio_path: Path
-    chapters: typing.Iterable[YtChapter]
+    chapters: typing.List[YtChapter]
 
 
 class YtDlpAdapter:
@@ -42,7 +42,8 @@ class YtDlpAdapter:
             video_id = response["id"]
             title = response["title"]
             audio_path = self.temp_dir / f"{video_id}.m4a"
-            chapters = [YtChapter(**chapter) for chapter in response["chapters"]]
+            chapter_objects = response["chapters"] if response["chapters"] else []
+            chapters = [YtChapter(**chapter) for chapter in chapter_objects]
 
             return YtVideoInfo(
                 video_id=video_id,

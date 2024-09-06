@@ -14,5 +14,13 @@ dependencies = [
 [tool.uv]
 dev-dependencies = [
     "ipython>=8.27.0",
+    "mypy>=1.11.2",
     "ruff>=0.6.3",
 ]
+
+[[tool.mypy.overrides]]
+module = [
+    "yt_dlp",
+    "faster_whisper",
+]
+ignore_missing_imports = true
