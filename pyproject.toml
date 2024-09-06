@@ -1,0 +1,18 @@
+[project]
+name = "yt-extractor"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "faster-whisper>=1.0.3",
+    "ollama>=0.3.2",
+    "typer-slim>=0.12.5",
+    "yt-dlp>=2024.8.6",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ipython>=8.27.0",
+    "ruff>=0.6.3",
+]
