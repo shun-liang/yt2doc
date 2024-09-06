@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 class Chapter(typing.Protocol):
     title: str
+    start_time: float
     end_time: float
 
 
@@ -44,7 +45,15 @@ class WhisperAdapter:
             title=current_chapter.title, text=""
         )
         for segment in segments:
-            while segment.start > current_chapter.end_time:
+            while (
+                self._calculate_overlap(
+                    segment_start=segment.start,
+                    segment_end=segment.end,
+                    chapter_start=current_chapter.start_time,
+                    chapter_end=current_chapter.end_time,
+                )
+                < 0.5
+            ):
                 current_chapter = next(chapters_iterator)
                 chapter_transcriptions.append(current_chapter_transcription)
                 current_chapter_transcription = ChapterTranscription(
@@ -54,3 +63,17 @@ class WhisperAdapter:
         chapter_transcriptions.append(current_chapter_transcription)
 
         return chapter_transcriptions
+
+    @staticmethod
+    # Inspired by https://stackoverflow.com/a/9044111
+    def _calculate_overlap(
+        segment_start: float,
+        segment_end: float,
+        chapter_start: float,
+        chapter_end: float,
+    ) -> float:
+        segment_length = segment_end - segment_start
+        latest_start = max(segment_start, chapter_start)
+        earlist_end = min(segment_end, chapter_end)
+        delta = max(0, earlist_end - latest_start)
+        return delta / segment_length
