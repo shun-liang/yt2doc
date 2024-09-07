@@ -30,8 +30,12 @@ class WhisperAdapter:
         segments, _ = self.model.transcribe(audio=audio_path)
         return "".join(s.text for s in segments)
 
-    def transcribe_by_chapter(self, audio_path: Path, chapters: typing.List[Chapter]):
-        segments, _ = self.model.transcribe(audio=audio_path)
+    def transcribe_by_chapter(
+        self, audio_path: Path, title: str, chapters: typing.List[Chapter]
+    ):
+        segments, _ = self.model.transcribe(
+            audio=audio_path, initial_prompt=f"Title: ${title}"
+        )
 
         if len(chapters) == 0:
             return [

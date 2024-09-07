@@ -2,8 +2,6 @@ import tempfile
 import time
 import typing
 
-import typing_extensions
-
 import typer
 
 from pathlib import Path
@@ -34,11 +32,37 @@ def extract(
     playlist: typing.Optional[str] = typer.Option(
         None, "--playlist", help="URL of the playlist to extract"
     ),
-    # by_chapter: typing.Annotated[bool, typer.Option(False, "If should split the audio by YouTube video chapter")],
-    by_chapter: typing.Annotated[bool, typer.Option("--by-chapter")] = False,
+    by_chapter: typing.Annotated[
+        bool,
+        typer.Option(
+            "--by-chapter", help="If should split the audio by YouTube video chapter"
+        ),
+    ] = False,
+    whisper_model_size: typing.Optional[str] = typer.Option(
+        None, "--whisper-model", help="Whisper model to use for transcription"
+    ),
+    whisper_compute_type: typing.Optional[str] = typer.Option(
+        None,
+        "--whisper-compute-type",
+        help="Whisper compute type to use for transcription",
+    ),
+    whisper_device: typing.Optional[str] = typer.Option(
+        None, "--whisper-device", help="Whisper device type to use for transcription"
+    ),
 ):
+    if not whisper_model_size:
+        whisper_model_size = "base"
+
+    if not whisper_compute_type:
+        whisper_compute_type = "int8"
+
+    if not whisper_device:
+        whisper_device = "cpu"
+
     whisper_model = WhisperModel(
-        model_size_or_path="base", device="cpu", compute_type="int8"
+        model_size_or_path=whisper_model_size,
+        device=whisper_device,
+        compute_type=whisper_compute_type,
     )
     whisper_adapter = WhisperAdapter(model=whisper_model)
 
@@ -58,7 +82,9 @@ def extract(
             with Timer() as transcribe_timer:
                 if by_chapter:
                     transcripts_by_chapter = whisper_adapter.transcribe_by_chapter(
-                        audio_path=video_info.audio_path, chapters=video_info.chapters
+                        audio_path=video_info.audio_path,
+                        title=video_info.title,
+                        chapters=video_info.chapters,
                     )
                     transcript = "\n\n".join(
                         [
