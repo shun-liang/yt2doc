@@ -1,5 +1,4 @@
 import tempfile
-import time
 import typing
 
 import typer
@@ -8,28 +7,24 @@ from pathlib import Path
 
 from faster_whisper import WhisperModel
 
+from yt_extractor.timer import Timer
 from yt_extractor.yt_dlp_adapter import YtDlpAdapter
 from yt_extractor.whisper_adapter import WhisperAdapter
-
-
-class Timer:
-    def __enter__(self):
-        self._start = time.perf_counter()
-        return self
-
-    def __exit__(self, type, value, traceback):
-        self.seconds = time.perf_counter() - self._start
+from yt_extractor.file_cache import FileCache
+from yt_extractor.transcript_extractor import TranscriptExtractor
 
 
 app = typer.Typer()
 
+DEFAULT_CACHE_PATH = Path.home() / ".yt-extractor"
+
 
 @app.command()
 def extract(
-    video: typing.Optional[str] = typer.Option(
+    video_url: typing.Optional[str] = typer.Option(
         None, "--video", help="URL of the video to extract"
     ),
-    playlist: typing.Optional[str] = typer.Option(
+    playlist_url: typing.Optional[str] = typer.Option(
         None, "--playlist", help="URL of the playlist to extract"
     ),
     by_chapter: typing.Annotated[
@@ -49,7 +44,11 @@ def extract(
     whisper_device: typing.Optional[str] = typer.Option(
         None, "--whisper-device", help="Whisper device type to use for transcription"
     ),
-):
+    skip_cache: typing.Annotated[
+        bool,
+        typer.Option("--skip-cache", help="If should skip reading from cache"),
+    ] = False,
+) -> None:
     if not whisper_model_size:
         whisper_model_size = "base"
 
@@ -58,6 +57,9 @@ def extract(
 
     if not whisper_device:
         whisper_device = "cpu"
+
+    DEFAULT_CACHE_PATH.mkdir(exist_ok=True)
+    file_cache = FileCache(cache_dir=DEFAULT_CACHE_PATH)
 
     whisper_model = WhisperModel(
         model_size_or_path=whisper_model_size,
@@ -70,39 +72,45 @@ def extract(
         temp_dir = Path(temp_dir_name)
         yt_dlp_adapter = YtDlpAdapter(temp_dir=temp_dir)
 
-        if video:
-            typer.echo(f"extracting video {video}", err=True)
+        transcript_extractor = TranscriptExtractor(
+            yt_dlp_adapter=yt_dlp_adapter,
+            whisper_adapter=whisper_adapter,
+            file_cache=file_cache,
+            meta={
+                "whisper_model_size": whisper_model_size,
+                "whisper_compute_type": whisper_compute_type,
+                "whisper_device": whisper_device,
+            },
+        )
 
-            with Timer() as yt_dl_timer:
-                video_info = yt_dlp_adapter.extract_video_info(video_url=video)
-            typer.echo(
-                f"Video downloading time: {yt_dl_timer.seconds} seconds", err=True
-            )
+        if video_url:
+            typer.echo(f"extracting video {video_url}", err=True)
 
-            with Timer() as transcribe_timer:
-                if by_chapter:
-                    transcripts_by_chapter = whisper_adapter.transcribe_by_chapter(
-                        audio_path=video_info.audio_path,
-                        title=video_info.title,
-                        chapters=video_info.chapters,
-                    )
-                    transcript = "\n\n".join(
-                        [
-                            f"## {chapter.title}\n\n{chapter.text}"
-                            for chapter in transcripts_by_chapter
-                        ]
-                    )
-                else:
-                    transcript = whisper_adapter.transcribe_full_text(
-                        audio_path=video_info.audio_path
-                    )
-            typer.echo(
-                f"Transcription time: {transcribe_timer.seconds} seconds", err=True
-            )
-            typer.echo(f"# {video_info.title}\n\n{video}\n\n{transcript}")
+            if by_chapter:
+                transcript_by_chapter = transcript_extractor.extract_by_chapter(
+                    video_url=video_url, skip_cache=skip_cache
+                )
+                header = f"# {transcript_by_chapter.title}\n\n{video_url}"
+                transcript_text = "'\n\n".join(
+                    [
+                        f"## {chapter.title}\n\n{chapter.text}"
+                        for chapter in transcript_by_chapter.chapters
+                    ]
+                )
+                transcript_text = f"{header}\n\n{transcript_text}"
 
-        elif playlist:
-            typer.echo(f"extracting playlist {playlist}", err=True)
+            else:
+                transcript = transcript_extractor.extract(
+                    video_url=video_url, skip_cache=skip_cache
+                )
+                transcript_text = (
+                    f"# {transcript.title}\n\n{video_url}\n\n{transcript.text}"
+                )
+
+            typer.echo(transcript_text)
+
+        elif playlist_url:
+            typer.echo(f"extracting playlist {playlist_url}", err=True)
         else:
             typer.echo("Please provide either --video or --playlist option", err=True)
 
@@ -115,7 +123,7 @@ def summarize(
     playlist: typing.Optional[str] = typer.Option(
         None, "--playlist", help="URL of the playlist to summarize"
     ),
-):
+) -> None:
     if video:
         typer.echo(f"summarizing video {video}", err=True)
     elif playlist:

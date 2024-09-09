@@ -31,8 +31,8 @@ class WhisperAdapter:
         return "".join(s.text for s in segments)
 
     def transcribe_by_chapter(
-        self, audio_path: Path, title: str, chapters: typing.List[Chapter]
-    ):
+        self, audio_path: Path, title: str, chapters: typing.Sequence[Chapter]
+    ) -> typing.Sequence[ChapterTranscription]:
         segments, _ = self.model.transcribe(
             audio=audio_path, initial_prompt=f"Title: ${title}"
         )
@@ -78,6 +78,6 @@ class WhisperAdapter:
     ) -> float:
         segment_length = segment_end - segment_start
         latest_start = max(segment_start, chapter_start)
-        earlist_end = min(segment_end, chapter_end)
-        delta = max(0, earlist_end - latest_start)
+        earliest_end = min(segment_end, chapter_end)
+        delta = max(0, earliest_end - latest_start)
         return delta / segment_length
