@@ -2,7 +2,6 @@ import typing
 import json
 
 from dataclasses import dataclass
-from datetime import datetime, UTC
 from pathlib import Path
 
 
@@ -60,7 +59,7 @@ class FileCache:
             json.dump(
                 {
                     "transcript": transcript,
-                    "meta": {**meta, "timestamp": datetime.now(UTC).isoformat()},
+                    "meta": meta,
                 },
                 f,
             )
@@ -81,7 +80,7 @@ class FileCache:
                         {"title": chapter.title, "text": chapter.text}
                         for chapter in chapters
                     ],
-                    "meta": {**meta, "timestamp": datetime.now(UTC).isoformat()},
+                    "meta": meta,
                 },
                 f,
             )

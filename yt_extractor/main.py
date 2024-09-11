@@ -1,5 +1,6 @@
 import tempfile
 import typing
+import logging
 
 import typer
 
@@ -7,12 +8,14 @@ from pathlib import Path
 
 from faster_whisper import WhisperModel
 
-from yt_extractor.timer import Timer
 from yt_extractor.yt_dlp_adapter import YtDlpAdapter
 from yt_extractor.whisper_adapter import WhisperAdapter
 from yt_extractor.file_cache import FileCache
 from yt_extractor.transcript_extractor import TranscriptExtractor
+from yt_extractor.formatter import Formatter
 
+
+logging.basicConfig(level=logging.INFO)
 
 app = typer.Typer()
 
@@ -68,6 +71,8 @@ def extract(
     )
     whisper_adapter = WhisperAdapter(model=whisper_model)
 
+    formatter = Formatter()
+
     with tempfile.TemporaryDirectory() as temp_dir_name:
         temp_dir = Path(temp_dir_name)
         yt_dlp_adapter = YtDlpAdapter(temp_dir=temp_dir)
@@ -90,27 +95,36 @@ def extract(
                 transcript_by_chapter = transcript_extractor.extract_by_chapter(
                     video_url=video_url, skip_cache=skip_cache
                 )
-                header = f"# {transcript_by_chapter.title}\n\n{video_url}"
-                transcript_text = "'\n\n".join(
-                    [
-                        f"## {chapter.title}\n\n{chapter.text}"
-                        for chapter in transcript_by_chapter.chapters
-                    ]
+                transcript_text = formatter.chaptered_transcript_to_markdown(
+                    chaptered_transcript=transcript_by_chapter, is_root=True
                 )
-                transcript_text = f"{header}\n\n{transcript_text}"
 
             else:
                 transcript = transcript_extractor.extract(
                     video_url=video_url, skip_cache=skip_cache
                 )
-                transcript_text = (
-                    f"# {transcript.title}\n\n{video_url}\n\n{transcript.text}"
+                transcript_text = formatter.transcript_to_markdown(
+                    transcript=transcript, is_root=True
                 )
 
             typer.echo(transcript_text)
 
         elif playlist_url:
             typer.echo(f"extracting playlist {playlist_url}", err=True)
+            if by_chapter:
+                chaptered_transcribed_playlist = (
+                    transcript_extractor.extract_playlist_by_chapter(
+                        playlist_url=playlist_url, skip_cache=skip_cache
+                    )
+                )
+                transcripts_text = formatter.chaptered_playlist_transcripts_to_markdown(
+                    chaptered_playlist=chaptered_transcribed_playlist
+                )
+            else:
+                transcripts_text = ""
+
+            typer.echo(transcripts_text)
+
         else:
             typer.echo("Please provide either --video or --playlist option", err=True)
 

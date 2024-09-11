@@ -39,7 +39,9 @@ class WhisperAdapter:
 
         if len(chapters) == 0:
             return [
-                ChapterTranscription(title="", text="".join(s.text for s in segments))
+                ChapterTranscription(
+                    title="Untitled Chapter", text="".join(s.text for s in segments)
+                )
             ]
 
         chapters_iterator = iter(chapters)

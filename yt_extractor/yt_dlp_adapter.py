@@ -17,7 +17,13 @@ class YtChapter:
 class YtVideoInfo:
     video_id: str
     title: str
-    chapters: typing.List[YtChapter]
+    chapters: typing.Sequence[YtChapter]
+
+
+@dataclass
+class YtPlaylistInfo:
+    title: str
+    video_urls: typing.Sequence[str]
 
 
 class YtDlpAdapter:
@@ -46,6 +52,7 @@ class YtDlpAdapter:
     def extract_audio(self, video_url: str) -> Path:
         ydl_opts = {
             "quiet": True,
+            "noprogress": True,
             "outtmpl": f"{self.temp_dir}/%(id)s.%(ext)s",
             "format": "m4a/bestaudio/best",
             "postprocessors": [
@@ -61,3 +68,24 @@ class YtDlpAdapter:
         video_id = response["id"]
         audio_path = self.temp_dir / f"{video_id}.m4a"
         return audio_path
+
+    def extract_playlist_info(self, playlist_url: str) -> YtPlaylistInfo:
+        ydl_opts = {
+            "extract_flat": "in_playlist",
+            "quiet": True,
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            playlist_info = ydl.extract_info(playlist_url, download=False)
+
+        title: str = playlist_info["title"]
+        entries = playlist_info["entries"]
+        video_urls = [
+            entry["url"]
+            for entry in entries
+            if entry["title"] not in ["[Private video]", "[Deleted video]"]
+        ]
+        return YtPlaylistInfo(
+            title=title,
+            video_urls=video_urls,
+        )

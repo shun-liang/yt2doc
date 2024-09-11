@@ -15,19 +15,41 @@ MetaDict = typing.Dict[str, typing.Union[str, int, float]]
 
 @dataclass
 class Transcript:
+    url: str
     title: str
     text: str
 
 
-class TranscriptChapterLike(typing.Protocol):
+class TranscriptChapter(typing.Protocol):
     title: str
     text: str
 
 
 @dataclass
 class ChapteredTranscript:
+    url: str
     title: str
-    chapters: typing.Sequence[TranscriptChapterLike]
+    chapters: typing.Sequence[TranscriptChapter]
+
+
+@dataclass
+class TranscribedPlaylist:
+    url: str
+    title: str
+    transcripts: typing.Sequence[Transcript]
+
+
+class ChapteredTranscriptProtocol(typing.Protocol):
+    url: str
+    title: str
+    chapters: typing.Sequence[TranscriptChapter]
+
+
+@dataclass
+class ChapteredTranscribedPlaylist:
+    url: str
+    title: str
+    transcripts: typing.Sequence[ChapteredTranscriptProtocol]
 
 
 class TranscriptExtractor:
@@ -58,7 +80,9 @@ class TranscriptExtractor:
             )
             is not None
         ):
-            return Transcript(title=video_info.title, text=cached_transcript)
+            return Transcript(
+                url=video_url, title=video_info.title, text=cached_transcript
+            )
 
         with Timer() as yt_dlp_timer:
             audio_path = self.yt_dlp_adapter.extract_audio(video_url=video_url)
@@ -75,13 +99,15 @@ class TranscriptExtractor:
         self.file_cache.cache_transcript(
             video_id=video_info.video_id, transcript=transcript, meta=self.meta
         )
-        return Transcript(title=video_info.title, text=transcript)
+        return Transcript(url=video_url, title=video_info.title, text=transcript)
 
     def extract_by_chapter(
         self,
         video_url: str,
         skip_cache: bool,
     ) -> ChapteredTranscript:
+        logger.info(f"Extracting video {video_url} by chapter.")
+
         video_info = self.yt_dlp_adapter.extract_video_info(video_url=video_url)
         if (
             not skip_cache
@@ -93,7 +119,9 @@ class TranscriptExtractor:
             is not None
         ):
             return ChapteredTranscript(
-                title=video_info.title, chapters=cached_chaptered_transcript
+                url=video_url,
+                title=video_info.title,
+                chapters=cached_chaptered_transcript,
             )
 
         with Timer() as yt_dlp_timer:
@@ -117,5 +145,22 @@ class TranscriptExtractor:
         )
 
         return ChapteredTranscript(
-            title=video_info.title, chapters=transcripts_by_chapter
+            url=video_url, title=video_info.title, chapters=transcripts_by_chapter
+        )
+
+    def extract_playlist_by_chapter(
+        self, playlist_url: str, skip_cache: bool
+    ) -> ChapteredTranscribedPlaylist:
+        playlist_info = self.yt_dlp_adapter.extract_playlist_info(
+            playlist_url=playlist_url
+        )
+
+        transcripts = [
+            self.extract_by_chapter(video_url=video_url, skip_cache=skip_cache)
+            for video_url in playlist_info.video_urls
+        ]
+        return ChapteredTranscribedPlaylist(
+            url=playlist_url,
+            title=playlist_info.title,
+            transcripts=transcripts,
         )
