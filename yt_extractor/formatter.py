@@ -51,7 +51,7 @@ class Formatter:
         video_title_template, chapter_title_template = (
             self._get_video_and_chapter_title_templates(is_root=is_root)
         )
-        transcript_text = "'\n\n".join(
+        transcript_text = "\n\n".join(
             [
                 f"{chapter_title_template.format(name=chapter.title)}\n\n{chapter.text}"
                 for chapter in chaptered_transcript.chapters

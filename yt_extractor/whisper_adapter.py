@@ -1,13 +1,16 @@
 import typing
-import logging
 
 from pathlib import Path
 from dataclasses import dataclass
 
-from faster_whisper import WhisperModel
+from faster_whisper import WhisperModel, transcribe
 
 
-logger = logging.getLogger(__name__)
+@dataclass
+class Sentence:
+    text: str
+    start: float
+    end: float
 
 
 class Chapter(typing.Protocol):
@@ -34,13 +37,39 @@ class WhisperAdapter:
         self, audio_path: Path, title: str, chapters: typing.Sequence[Chapter]
     ) -> typing.Sequence[ChapterTranscription]:
         segments, _ = self.model.transcribe(
-            audio=audio_path, initial_prompt=f"Title: ${title}"
+            audio=audio_path,
+            initial_prompt=f"${title} {"".join(chapter.title for chapter in chapters)}",
+            word_timestamps=True,
         )
+
+        sentences: typing.List[Sentence] = []
+        current_sentence_words: typing.List[transcribe.Word] = []
+
+        for segment in segments:
+            for word in segment.words:
+                current_sentence_words.append(word)
+                if word.word.endswith((".", "?", "!")):
+                    sentences.append(
+                        Sentence(
+                            start=current_sentence_words[0].start,
+                            end=current_sentence_words[-1].end,
+                            text="".join(word.word for word in current_sentence_words),
+                        )
+                    )
+                    current_sentence_words = []
+        if len(current_sentence_words) != 0:
+            sentences.append(
+                Sentence(
+                    start=current_sentence_words[0].start,
+                    end=current_sentence_words[-1].end,
+                    text="".join(word.word for word in current_sentence_words),
+                )
+            )
 
         if len(chapters) == 0:
             return [
                 ChapterTranscription(
-                    title="Untitled Chapter", text="".join(s.text for s in segments)
+                    title="Untitled Chapter", text="".join(s.text for s in sentences)
                 )
             ]
 
@@ -50,11 +79,11 @@ class WhisperAdapter:
         current_chapter_transcription = ChapterTranscription(
             title=current_chapter.title, text=""
         )
-        for segment in segments:
+        for sentence in sentences:
             while (
                 self._calculate_overlap(
-                    segment_start=segment.start,
-                    segment_end=segment.end,
+                    sentence_start=sentence.start,
+                    sentence_end=sentence.end,
                     chapter_start=current_chapter.start_time,
                     chapter_end=current_chapter.end_time,
                 )
@@ -65,7 +94,7 @@ class WhisperAdapter:
                 current_chapter_transcription = ChapterTranscription(
                     title=current_chapter.title, text=""
                 )
-            current_chapter_transcription.text += segment.text
+            current_chapter_transcription.text += sentence.text
         chapter_transcriptions.append(current_chapter_transcription)
 
         return chapter_transcriptions
@@ -73,13 +102,13 @@ class WhisperAdapter:
     @staticmethod
     # Inspired by https://stackoverflow.com/a/9044111
     def _calculate_overlap(
-        segment_start: float,
-        segment_end: float,
+        sentence_start: float,
+        sentence_end: float,
         chapter_start: float,
         chapter_end: float,
     ) -> float:
-        segment_length = segment_end - segment_start
-        latest_start = max(segment_start, chapter_start)
-        earliest_end = min(segment_end, chapter_end)
+        sentence_length = sentence_end - sentence_start
+        latest_start = max(sentence_start, chapter_start)
+        earliest_end = min(sentence_end, chapter_end)
         delta = max(0, earliest_end - latest_start)
-        return delta / segment_length
+        return delta / sentence_length
