@@ -10,8 +10,6 @@ from yt_extractor.timer import Timer
 
 logger = logging.getLogger(__file__)
 
-MetaDict = typing.Dict[str, typing.Union[str, int, float]]
-
 
 @dataclass
 class Transcript:
@@ -58,12 +56,10 @@ class TranscriptExtractor:
         yt_dlp_adapter: YtDlpAdapter,
         whisper_adapter: WhisperAdapter,
         file_cache: FileCache,
-        meta: MetaDict,
     ) -> None:
         self.yt_dlp_adapter = yt_dlp_adapter
         self.whisper_adapter = whisper_adapter
         self.file_cache = file_cache
-        self.meta = meta
 
     def extract(
         self,
@@ -97,7 +93,7 @@ class TranscriptExtractor:
         logger.info(f"Transcription time: {transcribe_timer.seconds} seconds")
 
         self.file_cache.cache_transcript(
-            video_id=video_info.video_id, transcript=transcript, meta=self.meta
+            video_id=video_info.video_id, transcript=transcript
         )
         return Transcript(url=video_url, title=video_info.title, text=transcript)
 
@@ -141,7 +137,6 @@ class TranscriptExtractor:
         self.file_cache.cache_chaptered_transcript(
             video_id=video_info.video_id,
             chapters=transcripts_by_chapter,
-            meta=self.meta,
         )
 
         return ChapteredTranscript(

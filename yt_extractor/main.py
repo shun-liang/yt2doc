@@ -62,7 +62,14 @@ def extract(
         whisper_device = "cpu"
 
     DEFAULT_CACHE_PATH.mkdir(exist_ok=True)
-    file_cache = FileCache(cache_dir=DEFAULT_CACHE_PATH)
+    file_cache = FileCache(
+        cache_dir=DEFAULT_CACHE_PATH,
+        meta={
+            "whisper_model_size": whisper_model_size,
+            "whisper_compute_type": whisper_compute_type,
+            "whisper_device": whisper_device,
+        },
+    )
 
     whisper_model = WhisperModel(
         model_size_or_path=whisper_model_size,
@@ -81,11 +88,6 @@ def extract(
             yt_dlp_adapter=yt_dlp_adapter,
             whisper_adapter=whisper_adapter,
             file_cache=file_cache,
-            meta={
-                "whisper_model_size": whisper_model_size,
-                "whisper_compute_type": whisper_compute_type,
-                "whisper_device": whisper_device,
-            },
         )
 
         if video_url:

@@ -1,5 +1,6 @@
 import typing
 import json
+import hashlib
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,14 +21,17 @@ MetaDict = typing.Dict[str, typing.Union[str, int, float]]
 
 
 class FileCache:
-    transcript_file_name = "transcript.json"
-    chaptered_transcript_file_name = "chaptered_transcript.json"
-
-    def __init__(self, cache_dir: Path) -> None:
+    def __init__(self, cache_dir: Path, meta: MetaDict) -> None:
         self.cache_dir = cache_dir
+        self.meta = meta
+        self.hashed_meta = hashlib.md5(
+            json.dumps(meta, sort_keys=True).encode()
+        ).hexdigest()
 
     def get_transcript(self, video_id: str) -> typing.Optional[str]:
-        file_path = self.cache_dir / video_id / self.transcript_file_name
+        file_path = (
+            self.cache_dir / video_id / "transcript" / f"{self.hashed_meta}.json"
+        )
         if not (file_path.exists()):
             return None
 
@@ -39,7 +43,12 @@ class FileCache:
     def get_chaptered_transcript(
         self, video_id: str
     ) -> typing.Optional[typing.Sequence[TranscriptChapter]]:
-        file_path = self.cache_dir / video_id / self.chaptered_transcript_file_name
+        file_path = (
+            self.cache_dir
+            / video_id
+            / "chaptered_transcript"
+            / f"{self.hashed_meta}.json"
+        )
         if not (file_path.exists()):
             return None
 
@@ -51,15 +60,16 @@ class FileCache:
         )
         return [TranscriptChapter(**chapter) for chapter in chapter_dicts]
 
-    def cache_transcript(self, video_id: str, transcript: str, meta: MetaDict) -> None:
-        dir = self.cache_dir / video_id
-        dir.mkdir(exist_ok=True)
-        file_path = dir / self.transcript_file_name
+    def cache_transcript(self, video_id: str, transcript: str) -> None:
+        dir = self.cache_dir / video_id / "transcript"
+        dir.mkdir(exist_ok=True, parents=True)
+        file_path = dir / f"{self.hashed_meta}.json"
+
         with open(file_path, "w+") as f:
             json.dump(
                 {
                     "transcript": transcript,
-                    "meta": meta,
+                    "meta": self.meta,
                 },
                 f,
             )
@@ -68,11 +78,11 @@ class FileCache:
         self,
         video_id: str,
         chapters: typing.Sequence[TranscriptChapterLike],
-        meta: MetaDict,
     ) -> None:
-        dir = self.cache_dir / video_id
-        dir.mkdir(exist_ok=True)
-        file_path = dir / self.chaptered_transcript_file_name
+        dir = self.cache_dir / video_id / "chaptered_transcript"
+        dir.mkdir(exist_ok=True, parents=True)
+        file_path = dir / f"{self.hashed_meta}.json"
+
         with open(file_path, "w+") as f:
             json.dump(
                 {
@@ -80,7 +90,7 @@ class FileCache:
                         {"title": chapter.title, "text": chapter.text}
                         for chapter in chapters
                     ],
-                    "meta": meta,
+                    "meta": self.meta,
                 },
                 f,
             )
