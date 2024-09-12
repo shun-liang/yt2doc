@@ -89,12 +89,18 @@ class WhisperAdapter:
                 )
                 < 0.5
             ):
-                current_chapter = next(chapters_iterator)
-                chapter_transcriptions.append(current_chapter_transcription)
-                current_chapter_transcription = ChapterTranscription(
-                    title=current_chapter.title, text=""
-                )
+                try:
+                    current_chapter = next(chapters_iterator)
+                except StopIteration:
+                    pass
+                else:
+                    chapter_transcriptions.append(current_chapter_transcription)
+                    current_chapter_transcription = ChapterTranscription(
+                        title=current_chapter.title, text=""
+                    )
+
             current_chapter_transcription.text += sentence.text
+
         chapter_transcriptions.append(current_chapter_transcription)
 
         return chapter_transcriptions
