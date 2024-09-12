@@ -1,9 +1,13 @@
 import typing
+import logging
 
 from pathlib import Path
 from dataclasses import dataclass
 
 from faster_whisper import WhisperModel, transcribe
+
+
+logger = logging.getLogger(__file__)
 
 
 @dataclass
@@ -38,7 +42,7 @@ class WhisperAdapter:
     ) -> typing.Sequence[ChapterTranscription]:
         segments, _ = self.model.transcribe(
             audio=audio_path,
-            initial_prompt=f"${title} {"".join(chapter.title for chapter in chapters)}",
+            initial_prompt=title,
             word_timestamps=True,
         )
 
@@ -92,7 +96,7 @@ class WhisperAdapter:
                 try:
                     current_chapter = next(chapters_iterator)
                 except StopIteration:
-                    pass
+                    break
                 else:
                     chapter_transcriptions.append(current_chapter_transcription)
                     current_chapter_transcription = ChapterTranscription(
