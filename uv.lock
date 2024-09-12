@@ -786,6 +786,15 @@ wheels = [
 ]
 
 [[package]]
+name = "types-tqdm"
+version = "4.66.0.20240417"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2c/65/f14716c07d40f51be63cb46d89a71c4c5314bcf501506930b7fa5201ece0/types-tqdm-4.66.0.20240417.tar.gz", hash = "sha256:16dce9ef522ea8d40e4f5b8d84dd8a1166eefc13ceee7a7e158bf0f1a1421a31", size = 11916 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d7/dd/39a411628bfdeeac54587aa013a83a446a2ecf8e7e324744b9ba3bf076f3/types_tqdm-4.66.0.20240417-py3-none-any.whl", hash = "sha256:248aef1f9986b7b8c2c12b3cb4399fc17dba0a29e7e3f3f9cd704babb879383d", size = 19163 },
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.12.2"
 source = { registry = "https://pypi.org/simple" }
@@ -869,6 +878,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "faster-whisper" },
     { name = "ollama" },
+    { name = "tqdm" },
     { name = "typer-slim" },
     { name = "yt-dlp" },
 ]
@@ -878,12 +888,14 @@ dev = [
     { name = "ipython" },
     { name = "mypy" },
     { name = "ruff" },
+    { name = "types-tqdm" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "faster-whisper", specifier = ">=1.0.3" },
     { name = "ollama", specifier = ">=0.3.2" },
+    { name = "tqdm", specifier = ">=4.66.5" },
     { name = "typer-slim", specifier = ">=0.12.5" },
     { name = "yt-dlp", specifier = ">=2024.8.6" },
 ]
@@ -893,4 +905,5 @@ dev = [
     { name = "ipython", specifier = ">=8.27.0" },
     { name = "mypy", specifier = ">=1.11.2" },
     { name = "ruff", specifier = ">=0.6.3" },
+    { name = "types-tqdm", specifier = ">=4.66.0.20240417" },
 ]

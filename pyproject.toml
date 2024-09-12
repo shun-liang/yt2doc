@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "faster-whisper>=1.0.3",
     "ollama>=0.3.2",
+    "tqdm>=4.66.5",
     "typer-slim>=0.12.5",
     "yt-dlp>=2024.8.6",
 ]
@@ -16,6 +17,7 @@ dev-dependencies = [
     "ipython>=8.27.0",
     "mypy>=1.11.2",
     "ruff>=0.6.3",
+    "types-tqdm>=4.66.0.20240417",
 ]
 
 [[tool.mypy.overrides]]

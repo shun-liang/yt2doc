@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 from dataclasses import dataclass
 
+from tqdm import tqdm
 from faster_whisper import WhisperModel, transcribe
 
 
@@ -40,35 +41,49 @@ class WhisperAdapter:
     def transcribe_by_chapter(
         self, audio_path: Path, title: str, chapters: typing.Sequence[Chapter]
     ) -> typing.Sequence[ChapterTranscription]:
-        segments, _ = self.model.transcribe(
+        segments, transcribe_info = self.model.transcribe(
             audio=audio_path,
             initial_prompt=title,
             word_timestamps=True,
         )
 
+        audio_duration = round(transcribe_info.duration, 2)
+        current_timestamp = 0.0
+
         sentences: typing.List[Sentence] = []
         current_sentence_words: typing.List[transcribe.Word] = []
 
-        for segment in segments:
-            for word in segment.words:
-                current_sentence_words.append(word)
-                if word.word.endswith((".", "?", "!")):
-                    sentences.append(
-                        Sentence(
-                            start=current_sentence_words[0].start,
-                            end=current_sentence_words[-1].end,
-                            text="".join(word.word for word in current_sentence_words),
+        with tqdm(
+            total=audio_duration,
+            unit=" audio seconds",
+            desc="Faster Whisper transcription",
+        ) as progress_bar:
+            for segment in segments:
+                for word in segment.words:
+                    current_sentence_words.append(word)
+                    if word.word.endswith((".", "?", "!")):
+                        sentences.append(
+                            Sentence(
+                                start=current_sentence_words[0].start,
+                                end=current_sentence_words[-1].end,
+                                text="".join(
+                                    word.word for word in current_sentence_words
+                                ),
+                            )
                         )
+                        current_sentence_words = []
+                progress_bar.update(segment.end - current_timestamp)
+                current_timestamp = segment.end
+            if len(current_sentence_words) != 0:
+                sentences.append(
+                    Sentence(
+                        start=current_sentence_words[0].start,
+                        end=current_sentence_words[-1].end,
+                        text="".join(word.word for word in current_sentence_words),
                     )
-                    current_sentence_words = []
-        if len(current_sentence_words) != 0:
-            sentences.append(
-                Sentence(
-                    start=current_sentence_words[0].start,
-                    end=current_sentence_words[-1].end,
-                    text="".join(word.word for word in current_sentence_words),
                 )
-            )
+            if current_timestamp < audio_duration:  # silence at the end of the audio
+                progress_bar.update(audio_duration - current_timestamp)
 
         if len(chapters) == 0:
             return [
