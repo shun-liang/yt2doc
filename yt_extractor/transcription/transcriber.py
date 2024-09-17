@@ -135,12 +135,22 @@ class Transcriber:
         )
         rounded_full_audio_duration = round(full_audio_duration, 2)
         current_timestamp = 0.0
+        if len(video_info.chapters) > 0:
+            chapters = video_info.chapters
+        else:
+            chapters = [
+                youtube_interfaces.YtChapter(
+                    title="Untitled chapter",
+                    start_time=0.0,
+                    end_time=full_audio_duration,
+                )
+            ]
         with tqdm(
             total=rounded_full_audio_duration,
             unit=" audio seconds",
             desc="Faster Whisper transcription",
         ) as progress_bar:
-            for chapter in video_info.chapters:
+            for chapter in chapters:
                 audio_chunk_path = self._get_audio_chunk_for_chapter(
                     audio_path=audio_path, chapter=chapter
                 )
