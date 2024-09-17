@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "faster-whisper>=1.0.3",
-    "ollama>=0.3.2",
+    "instructor>=1.4.1",
+    "openai>=1.45.0",
+    "pydantic>=2.9.1",
     "tqdm>=4.66.5",
     "typer-slim>=0.12.5",
     "yt-dlp>=2024.8.6",

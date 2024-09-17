@@ -7,12 +7,14 @@ import typer
 from pathlib import Path
 
 from faster_whisper import WhisperModel
+from openai import OpenAI
 
-from yt_extractor.yt_dlp_adapter import YtDlpAdapter
-from yt_extractor.whisper_adapter import WhisperAdapter
-from yt_extractor.file_cache import FileCache
-from yt_extractor.transcript_extractor import TranscriptExtractor
-from yt_extractor.formatter import Formatter
+from yt_extractor.youtube.yt_video_info_extractor import YtVideoInfoExtractor
+from yt_extractor.youtube.yt_video_info_processor import YtVideoInfoProcessor
+from yt_extractor.transcription.transcriber import Transcriber
+from yt_extractor.extraction.file_cache import FileCache
+from yt_extractor.extraction.extractor import Extractor
+from yt_extractor.extraction.formatter import Formatter
 
 
 logging.basicConfig(level=logging.INFO)
@@ -76,17 +78,30 @@ def extract(
         device=whisper_device,
         compute_type=whisper_compute_type,
     )
-    whisper_adapter = WhisperAdapter(model=whisper_model)
+    llm_client = OpenAI(
+        base_url="http://localhost:11434/v1",
+        api_key="ollama",  # required, but unused
+    )
+
+    transcriber = Transcriber(
+        whisper_model=whisper_model, llm_client=llm_client, llm_model="mistral-nemo"
+    )
 
     formatter = Formatter()
 
+    video_info_processor = YtVideoInfoProcessor(
+        llm_client=llm_client, llm_model="mistral-nemo"
+    )
+
     with tempfile.TemporaryDirectory() as temp_dir_name:
         temp_dir = Path(temp_dir_name)
-        yt_dlp_adapter = YtDlpAdapter(temp_dir=temp_dir)
+        video_info_extractor = YtVideoInfoExtractor(
+            temp_dir=temp_dir, video_processor=video_info_processor
+        )
 
-        transcript_extractor = TranscriptExtractor(
-            yt_dlp_adapter=yt_dlp_adapter,
-            whisper_adapter=whisper_adapter,
+        transcript_extractor = Extractor(
+            video_info_extractor=video_info_extractor,
+            transcriber=transcriber,
             file_cache=file_cache,
         )
 

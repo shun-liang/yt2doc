@@ -2,26 +2,13 @@ import typing
 import json
 import hashlib
 
-from dataclasses import dataclass
 from pathlib import Path
 
-
-class TranscriptChapterLike(typing.Protocol):
-    title: str
-    text: str
-
-
-@dataclass
-class TranscriptChapter:
-    title: str
-    text: str
-
-
-MetaDict = typing.Dict[str, typing.Union[str, int, float]]
+from yt_extractor.extraction import interfaces
 
 
 class FileCache:
-    def __init__(self, cache_dir: Path, meta: MetaDict) -> None:
+    def __init__(self, cache_dir: Path, meta: interfaces.MetaDict) -> None:
         self.cache_dir = cache_dir
         self.meta = meta
         self.hashed_meta = hashlib.md5(
@@ -42,7 +29,7 @@ class FileCache:
 
     def get_chaptered_transcript(
         self, video_id: str
-    ) -> typing.Optional[typing.Sequence[TranscriptChapter]]:
+    ) -> typing.Optional[typing.Sequence[interfaces.TranscriptChapter]]:
         file_path = (
             self.cache_dir
             / video_id
@@ -58,7 +45,7 @@ class FileCache:
         chapter_dicts: typing.List[typing.Dict[str, typing.Any]] = (
             chaptered_transcript_dict["chapters"]
         )
-        return [TranscriptChapter(**chapter) for chapter in chapter_dicts]
+        return [interfaces.TranscriptChapter(**chapter) for chapter in chapter_dicts]
 
     def cache_transcript(self, video_id: str, transcript: str) -> None:
         dir = self.cache_dir / video_id / "transcript"
@@ -77,7 +64,7 @@ class FileCache:
     def cache_chaptered_transcript(
         self,
         video_id: str,
-        chapters: typing.Sequence[TranscriptChapterLike],
+        chapters: typing.Sequence[interfaces.TranscriptChapter],
     ) -> None:
         dir = self.cache_dir / video_id / "chaptered_transcript"
         dir.mkdir(exist_ok=True, parents=True)

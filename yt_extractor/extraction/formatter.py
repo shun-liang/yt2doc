@@ -1,33 +1,4 @@
-import typing
-
-
-class Transcript(typing.Protocol):
-    url: str
-    title: str
-    text: str
-
-
-class TranscriptChapter(typing.Protocol):
-    title: str
-    text: str
-
-
-class ChapteredTranscript(typing.Protocol):
-    url: str
-    title: str
-    chapters: typing.Sequence[TranscriptChapter]
-
-
-class TranscribedPlaylist(typing.Protocol):
-    url: str
-    title: str
-    transcripts: typing.Sequence[Transcript]
-
-
-class ChapteredTranscribedPlaylist(typing.Protocol):
-    url: str
-    title: str
-    transcripts: typing.Sequence[ChapteredTranscript]
+from yt_extractor.extraction import interfaces
 
 
 class Formatter:
@@ -38,7 +9,9 @@ class Formatter:
         else:
             return "## {name}", "### {name}"
 
-    def transcript_to_markdown(self, transcript: Transcript, is_root: bool) -> str:
+    def transcript_to_markdown(
+        self, transcript: interfaces.Transcript, is_root: bool
+    ) -> str:
         video_title_template, _ = self._get_video_and_chapter_title_templates(
             is_root=is_root
         )
@@ -46,7 +19,7 @@ class Formatter:
         return f"{video_title}\n\n{transcript.url}\n\n{transcript}"
 
     def chaptered_transcript_to_markdown(
-        self, chaptered_transcript: ChapteredTranscript, is_root: bool
+        self, chaptered_transcript: interfaces.ChapteredTranscript, is_root: bool
     ) -> str:
         video_title_template, chapter_title_template = (
             self._get_video_and_chapter_title_templates(is_root=is_root)
@@ -60,7 +33,7 @@ class Formatter:
         return f"{video_title_template.format(name=chaptered_transcript.title)}\n\n{chaptered_transcript.url}\n\n{transcript_text}"
 
     def chaptered_playlist_transcripts_to_markdown(
-        self, chaptered_playlist: ChapteredTranscribedPlaylist
+        self, chaptered_playlist: interfaces.ChapteredTranscribedPlaylist
     ) -> str:
         playlist_title = f"# {chaptered_playlist.title}"
 

@@ -1,36 +1,23 @@
-import typing
+import logging
 
 import yt_dlp
 
-from dataclasses import dataclass
 from pathlib import Path
 
-
-@dataclass
-class YtChapter:
-    title: str
-    start_time: float
-    end_time: float
+from yt_extractor.youtube import interfaces
 
 
-@dataclass
-class YtVideoInfo:
-    video_id: str
-    title: str
-    chapters: typing.Sequence[YtChapter]
+logger = logging.getLogger(__file__)
 
 
-@dataclass
-class YtPlaylistInfo:
-    title: str
-    video_urls: typing.Sequence[str]
-
-
-class YtDlpAdapter:
-    def __init__(self, temp_dir: Path):
+class YtVideoInfoExtractor:
+    def __init__(
+        self, temp_dir: Path, video_processor: interfaces.IYtVideoInfoProcessor
+    ):
         self.temp_dir = temp_dir
+        self.video_processor = video_processor
 
-    def extract_video_info(self, video_url: str) -> YtVideoInfo:
+    def extract_video_info(self, video_url: str) -> interfaces.YtVideoInfo:
         ydl_opts = {
             "quiet": True,
         }
@@ -41,12 +28,21 @@ class YtDlpAdapter:
         video_id = response["id"]
         title = response["title"]
         chapter_objects = response["chapters"] if response["chapters"] else []
-        chapters = [YtChapter(**chapter) for chapter in chapter_objects]
+        chapters = [interfaces.YtChapter(**chapter) for chapter in chapter_objects]
+        description = response["description"]
 
-        return YtVideoInfo(
+        processed_info = self.video_processor.process_video_info(
+            title=title, video_description=description
+        )
+
+        logger.info(f"processed video info: {processed_info}")
+
+        return interfaces.YtVideoInfo(
             video_id=video_id,
             title=title,
             chapters=chapters,
+            description=description,
+            processed_info=processed_info,
         )
 
     def extract_audio(self, video_url: str) -> Path:
@@ -69,7 +65,7 @@ class YtDlpAdapter:
         audio_path = self.temp_dir / f"{video_id}.m4a"
         return audio_path
 
-    def extract_playlist_info(self, playlist_url: str) -> YtPlaylistInfo:
+    def extract_playlist_info(self, playlist_url: str) -> interfaces.YtPlaylistInfo:
         ydl_opts = {
             "extract_flat": "in_playlist",
             "quiet": True,
@@ -85,7 +81,7 @@ class YtDlpAdapter:
             for entry in entries
             if entry["title"] not in ["[Private video]", "[Deleted video]"]
         ]
-        return YtPlaylistInfo(
+        return interfaces.YtPlaylistInfo(
             title=title,
             video_urls=video_urls,
         )

@@ -1,71 +1,29 @@
-import typing
 import logging
 
-from dataclasses import dataclass
-
-from yt_extractor.yt_dlp_adapter import YtDlpAdapter
-from yt_extractor.whisper_adapter import WhisperAdapter
-from yt_extractor.file_cache import FileCache
 from yt_extractor.timer import Timer
+from yt_extractor.youtube import interfaces as youtube_interfaces
+from yt_extractor.transcription import interfaces as transcription_interfaces
+from yt_extractor.extraction import interfaces
 
 logger = logging.getLogger(__file__)
 
 
-@dataclass
-class Transcript:
-    url: str
-    title: str
-    text: str
-
-
-class TranscriptChapter(typing.Protocol):
-    title: str
-    text: str
-
-
-@dataclass
-class ChapteredTranscript:
-    url: str
-    title: str
-    chapters: typing.Sequence[TranscriptChapter]
-
-
-@dataclass
-class TranscribedPlaylist:
-    url: str
-    title: str
-    transcripts: typing.Sequence[Transcript]
-
-
-class ChapteredTranscriptProtocol(typing.Protocol):
-    url: str
-    title: str
-    chapters: typing.Sequence[TranscriptChapter]
-
-
-@dataclass
-class ChapteredTranscribedPlaylist:
-    url: str
-    title: str
-    transcripts: typing.Sequence[ChapteredTranscriptProtocol]
-
-
-class TranscriptExtractor:
+class Extractor:
     def __init__(
         self,
-        yt_dlp_adapter: YtDlpAdapter,
-        whisper_adapter: WhisperAdapter,
-        file_cache: FileCache,
+        video_info_extractor: youtube_interfaces.IYtVideoInfoExtractor,
+        transcriber: transcription_interfaces.ITranscriber,
+        file_cache: interfaces.IFileCache,
     ) -> None:
-        self.yt_dlp_adapter = yt_dlp_adapter
-        self.whisper_adapter = whisper_adapter
+        self.yt_dlp_adapter = video_info_extractor
+        self.transcriber = transcriber
         self.file_cache = file_cache
 
     def extract(
         self,
         video_url: str,
         skip_cache: bool,
-    ) -> Transcript:
+    ) -> interfaces.Transcript:
         video_info = self.yt_dlp_adapter.extract_video_info(video_url=video_url)
         if (
             not skip_cache
@@ -76,7 +34,7 @@ class TranscriptExtractor:
             )
             is not None
         ):
-            return Transcript(
+            return interfaces.Transcript(
                 url=video_url, title=video_info.title, text=cached_transcript
             )
 
@@ -86,8 +44,9 @@ class TranscriptExtractor:
         logger.info(f"Video download and convert time: {yt_dlp_timer.seconds} seconds")
 
         with Timer() as transcribe_timer:
-            transcript = self.whisper_adapter.transcribe_full_text(
-                audio_path=audio_path
+            transcript = self.transcriber.transcribe_full_text(
+                audio_path=audio_path,
+                video_info=video_info,
             )
 
         logger.info(f"Transcription time: {transcribe_timer.seconds} seconds")
@@ -95,13 +54,15 @@ class TranscriptExtractor:
         self.file_cache.cache_transcript(
             video_id=video_info.video_id, transcript=transcript
         )
-        return Transcript(url=video_url, title=video_info.title, text=transcript)
+        return interfaces.Transcript(
+            url=video_url, title=video_info.title, text=transcript
+        )
 
     def extract_by_chapter(
         self,
         video_url: str,
         skip_cache: bool,
-    ) -> ChapteredTranscript:
+    ) -> interfaces.ChapteredTranscript:
         logger.info(f"Extracting video {video_url} by chapter.")
 
         video_info = self.yt_dlp_adapter.extract_video_info(video_url=video_url)
@@ -114,7 +75,7 @@ class TranscriptExtractor:
             )
             is not None
         ):
-            return ChapteredTranscript(
+            return interfaces.ChapteredTranscript(
                 url=video_url,
                 title=video_info.title,
                 chapters=cached_chaptered_transcript,
@@ -126,11 +87,13 @@ class TranscriptExtractor:
         logger.info(f"Video download and convert time: {yt_dlp_timer.seconds} seconds")
 
         with Timer() as transcribe_timer:
-            transcripts_by_chapter = self.whisper_adapter.transcribe_by_chapter(
-                audio_path=audio_path,
-                title=video_info.title,
-                chapters=video_info.chapters,
-            )
+            transcripts_by_chapter = [
+                interfaces.TranscriptChapter(title=chapter.title, text=chapter.text)
+                for chapter in self.transcriber.transcribe_by_chapter(
+                    audio_path=audio_path,
+                    video_info=video_info,
+                )
+            ]
 
         logger.info(f"Transcription time: {transcribe_timer.seconds} seconds")
 
@@ -139,13 +102,13 @@ class TranscriptExtractor:
             chapters=transcripts_by_chapter,
         )
 
-        return ChapteredTranscript(
+        return interfaces.ChapteredTranscript(
             url=video_url, title=video_info.title, chapters=transcripts_by_chapter
         )
 
     def extract_playlist_by_chapter(
         self, playlist_url: str, skip_cache: bool
-    ) -> ChapteredTranscribedPlaylist:
+    ) -> interfaces.ChapteredTranscribedPlaylist:
         playlist_info = self.yt_dlp_adapter.extract_playlist_info(
             playlist_url=playlist_url
         )
@@ -154,7 +117,7 @@ class TranscriptExtractor:
             self.extract_by_chapter(video_url=video_url, skip_cache=skip_cache)
             for video_url in playlist_info.video_urls
         ]
-        return ChapteredTranscribedPlaylist(
+        return interfaces.ChapteredTranscribedPlaylist(
             url=playlist_url,
             title=playlist_info.title,
             transcripts=transcripts,
