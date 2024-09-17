@@ -1,7 +1,22 @@
+import typing
+
+from wtpsplit import SaT
+
 from yt_extractor.extraction import interfaces
 
 
 class Formatter:
+    def __init__(self, sat: SaT) -> None:
+        self.sat = sat
+
+    def _paragraph_text(self, text: str) -> str:
+        paragraphed_sentences: typing.List[typing.List[str]] = self.sat.split(
+            text, do_paragraph_segmentation=True
+        )
+        paragraphs = ["".join(sentences) for sentences in paragraphed_sentences]
+        paragraphed_text = "\n\n".join(paragraphs)
+        return paragraphed_text
+
     @staticmethod
     def _get_video_and_chapter_title_templates(is_root: bool) -> tuple[str, str]:
         if is_root:
@@ -24,10 +39,15 @@ class Formatter:
         video_title_template, chapter_title_template = (
             self._get_video_and_chapter_title_templates(is_root=is_root)
         )
+        chapter_and_text_list: typing.List[typing.Tuple[str, str]] = []
+        for chapter in chaptered_transcript.chapters:
+            chapter_text = self._paragraph_text(chapter.text)
+            chapter_and_text_list.append((chapter.title, chapter_text))
+
         transcript_text = "\n\n".join(
             [
-                f"{chapter_title_template.format(name=chapter.title)}\n\n{chapter.text}"
-                for chapter in chaptered_transcript.chapters
+                f"{chapter_title_template.format(name=chapter_title)}\n\n{chapter_text}"
+                for chapter_title, chapter_text in chapter_and_text_list
             ]
         )
         return f"{video_title_template.format(name=chaptered_transcript.title)}\n\n{chaptered_transcript.url}\n\n{transcript_text}"

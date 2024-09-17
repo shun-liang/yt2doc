@@ -8,6 +8,7 @@ from pathlib import Path
 
 from faster_whisper import WhisperModel
 from openai import OpenAI
+from wtpsplit import SaT
 
 from yt_extractor.youtube.yt_video_info_extractor import YtVideoInfoExtractor
 from yt_extractor.youtube.yt_video_info_processor import YtVideoInfoProcessor
@@ -83,7 +84,8 @@ def extract(
         api_key="ollama",  # required, but unused
     )
 
-    formatter = Formatter()
+    sat = SaT("sat-3l")
+    formatter = Formatter(sat=sat)
 
     video_info_processor = YtVideoInfoProcessor(
         llm_client=llm_client, llm_model="mistral-nemo"
