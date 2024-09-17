@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "faster-whisper>=1.0.3",
+    "ffmpeg-python>=0.2.0",
     "instructor>=1.4.1",
     "openai>=1.45.0",
     "pydantic>=2.9.1",
@@ -26,5 +27,6 @@ dev-dependencies = [
 module = [
     "yt_dlp",
     "faster_whisper",
+    "ffmpeg",
 ]
 ignore_missing_imports = true

@@ -83,10 +83,6 @@ def extract(
         api_key="ollama",  # required, but unused
     )
 
-    transcriber = Transcriber(
-        whisper_model=whisper_model, llm_client=llm_client, llm_model="mistral-nemo"
-    )
-
     formatter = Formatter()
 
     video_info_processor = YtVideoInfoProcessor(
@@ -98,7 +94,12 @@ def extract(
         video_info_extractor = YtVideoInfoExtractor(
             temp_dir=temp_dir, video_processor=video_info_processor
         )
-
+        transcriber = Transcriber(
+            temp_dir=temp_dir,
+            whisper_model=whisper_model,
+            llm_client=llm_client,
+            llm_model="mistral-nemo",
+        )
         transcript_extractor = Extractor(
             video_info_extractor=video_info_extractor,
             transcriber=transcriber,
