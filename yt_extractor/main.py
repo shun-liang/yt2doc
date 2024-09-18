@@ -7,18 +7,20 @@ import typer
 from pathlib import Path
 
 from faster_whisper import WhisperModel
-from openai import OpenAI
 from wtpsplit import SaT
 
 from yt_extractor.youtube.yt_video_info_extractor import YtVideoInfoExtractor
-from yt_extractor.youtube.yt_video_info_processor import YtVideoInfoProcessor
 from yt_extractor.transcription.transcriber import Transcriber
+from yt_extractor.transcription.whisper_cpp_adapter import WhisperCppAdapter
+from yt_extractor.transcription.faster_whisper_adapter import FasterWhisperAdapter
 from yt_extractor.extraction.file_cache import FileCache
 from yt_extractor.extraction.extractor import Extractor
 from yt_extractor.extraction.formatter import Formatter
 
 
 logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger(__file__)
 
 app = typer.Typer()
 
@@ -74,33 +76,29 @@ def extract(
         },
     )
 
-    whisper_model = WhisperModel(
-        model_size_or_path=whisper_model_size,
-        device=whisper_device,
-        compute_type=whisper_compute_type,
-    )
-    llm_client = OpenAI(
-        base_url="http://localhost:11434/v1",
-        api_key="ollama",  # required, but unused
+    # whisper_model = WhisperModel(
+    #     model_size_or_path=whisper_model_size,
+    #     device=whisper_device,
+    #     compute_type=whisper_compute_type,
+    # )
+
+    whisper_cpp_adapter = WhisperCppAdapter(
+        whisper_cpp_executable=Path("~/Development/whisper.cpp/main").expanduser(),
+        whisper_cpp_model=Path(
+            "~/Development/whisper.cpp/models/ggml-medium.en.bin"
+        ).expanduser(),
     )
 
     sat = SaT("sat-3l")
     formatter = Formatter(sat=sat)
 
-    video_info_processor = YtVideoInfoProcessor(
-        llm_client=llm_client, llm_model="mistral-nemo"
-    )
-
     with tempfile.TemporaryDirectory() as temp_dir_name:
         temp_dir = Path(temp_dir_name)
-        video_info_extractor = YtVideoInfoExtractor(
-            temp_dir=temp_dir, video_processor=video_info_processor
-        )
+        video_info_extractor = YtVideoInfoExtractor(temp_dir=temp_dir)
         transcriber = Transcriber(
             temp_dir=temp_dir,
-            whisper_model=whisper_model,
-            llm_client=llm_client,
-            llm_model="mistral-nemo",
+            # whisper_model=whisper_model,
+            whisper_adapter=whisper_cpp_adapter,
         )
         transcript_extractor = Extractor(
             video_info_extractor=video_info_extractor,
@@ -115,6 +113,7 @@ def extract(
                 transcript_by_chapter = transcript_extractor.extract_by_chapter(
                     video_url=video_url, skip_cache=skip_cache
                 )
+                logger.info(f"transcript_by_chapter: {transcript_by_chapter}")
                 transcript_text = formatter.chaptered_transcript_to_markdown(
                     chaptered_transcript=transcript_by_chapter, is_root=True
                 )
