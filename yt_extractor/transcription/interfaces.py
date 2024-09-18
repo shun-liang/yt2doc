@@ -12,6 +12,18 @@ class ChapterTranscription(BaseModel):
     text: str
 
 
+class WhisperSegment(BaseModel):
+    start: float
+    end: float
+    text: str
+
+
+class IWhisperAdapter(typing.Protocol):
+    def transcribe(
+        self, audio_path: Path, initial_prompt: str
+    ) -> typing.Iterable[WhisperSegment]: ...
+
+
 class ITranscriber(typing.Protocol):
     def transcribe_full_text(
         self,

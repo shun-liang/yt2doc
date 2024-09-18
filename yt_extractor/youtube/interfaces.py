@@ -10,11 +10,6 @@ class Speaker(BaseModel):
     role: str
 
 
-class ProcessedInfo(BaseModel):
-    cleaned_description: str
-    speakers: typing.Sequence[Speaker]
-
-
 class YtChapter(BaseModel):
     title: str
     start_time: float
@@ -26,18 +21,11 @@ class YtVideoInfo(BaseModel):
     title: str
     chapters: typing.Sequence[YtChapter]
     description: str
-    processed_info: ProcessedInfo
 
 
 class YtPlaylistInfo(BaseModel):
     title: str
     video_urls: typing.Sequence[str]
-
-
-class IYtVideoInfoProcessor(typing.Protocol):
-    def process_video_info(
-        self, title: str, video_description: str
-    ) -> ProcessedInfo: ...
 
 
 class IYtVideoInfoExtractor(typing.Protocol):

@@ -1,16 +1,13 @@
+import re
 import typing
 import logging
 
 import uuid
 import ffmpeg
-import instructor
 
 from pathlib import Path
-from textwrap import dedent
 
 from tqdm import tqdm
-from faster_whisper import WhisperModel
-from openai import OpenAI
 from pydantic import BaseModel
 
 from yt_extractor.youtube import interfaces as youtube_interfaces
@@ -26,12 +23,6 @@ class Segment(BaseModel):
     text: str
 
 
-class Sentence(BaseModel):
-    text: str
-    start: float
-    end: float
-
-
 class WhisperPrompt(BaseModel):
     fictitious_prompt: str
 
@@ -40,51 +31,30 @@ class Transcriber:
     def __init__(
         self,
         temp_dir: Path,
-        whisper_model: WhisperModel,
-        llm_client: OpenAI,
-        llm_model: str,
+        whisper_adapter: interfaces.IWhisperAdapter,
     ):
         self.temp_dir = temp_dir
-        self.model = whisper_model
-        self.instructor_client = instructor.from_openai(
-            llm_client,
-            mode=instructor.Mode.JSON,
+        self.whisper_adapter = whisper_adapter
+
+    @staticmethod
+    def _clean_video_description(description: str) -> str:
+        url_pattern = r"https?://\S+"
+        timestamp_line_pattern = r"^\d+:\d+.*\n?"
+        hashtag_pattern = r"#\w+"
+
+        text = re.sub(
+            f"{url_pattern}|{timestamp_line_pattern}|{hashtag_pattern}",
+            "",
+            description,
+            flags=re.MULTILINE,
         )
-        self.llm_model = llm_model
+        text = text.strip()
+        text = re.sub(r"\n+| +", " ", text)
+        text = text.replace(":", ".")
+        return text
 
     def _get_initial_prompt(self, video_info: youtube_interfaces.YtVideoInfo) -> str:
-        # Inspired by https://cookbook.openai.com/examples/whisper_prompting_guide#fictitious-prompts-can-be-generated-by-gpt
-        resp = self.instructor_client.chat.completions.create(
-            model=self.llm_model,
-            response_model=WhisperPrompt,
-            messages=[
-                {
-                    "role": "system",
-                    "content": dedent("""
-                        You are a transcript generator.
-                        Your task is to create the first few sentences of the fictional transcript of a YouTube video.
-                        You will be given the TITLE and the DESCRIPTION of the video.
-                        The generated content should be very relevant to the TITLE and the DESCRIPTION.
-                        If the TITLE and the DESCRIPTION implies the video is a conversation,
-                        never diarize speakers or add quotation marks;
-                        instead, write all transcripts in a normal paragraph of text without speakers identified.
-                        Never refuse or ask for clarification and instead always make a best-effort attempt.
-                        Have a proper punctuation (.?!) when a sentences ends.
-                    """),
-                },
-                {
-                    "role": "user",
-                    "content": dedent(f"""
-                        TITLE:
-                        {video_info.title}
-
-                        DESCRIPTION:
-                        {video_info.processed_info.cleaned_description}
-                    """),
-                },
-            ],
-        )
-        return f"{video_info.title}. {video_info.processed_info.cleaned_description} {resp.fictitious_prompt}"
+        return f"{video_info.title}. {self._clean_video_description(description=video_info.description)}"
 
     def _get_audio_chunk_for_chapter(
         self, audio_path: Path, chapter: youtube_interfaces.YtChapter
@@ -101,14 +71,14 @@ class Transcriber:
         self, audio_path: Path, video_info: youtube_interfaces.YtVideoInfo
     ) -> str:
         initial_prompt = self._get_initial_prompt(video_info=video_info)
+        audio_duration: float = float(ffmpeg.probe(audio_path)["format"]["duration"])
+        rounded_audio_duration = round(audio_duration, 2)
         logger.info(f"Initial prompt: {initial_prompt}")
-        segments, transcribe_info = self.model.transcribe(
-            audio=audio_path,
+        segments = self.whisper_adapter.transcribe(
+            audio_path=audio_path,
             initial_prompt=initial_prompt,
-            vad_filter=True,
         )
         transcribed = ""
-        audio_duration = round(transcribe_info.duration, 2)
         current_timestamp = 0.0
         with tqdm(
             total=audio_duration,
@@ -120,7 +90,7 @@ class Transcriber:
                 progress_bar.update(segment.end - current_timestamp)
                 current_timestamp = segment.end
             if current_timestamp < audio_duration:  # silence at the end of the audio
-                progress_bar.update(audio_duration - current_timestamp)
+                progress_bar.update(rounded_audio_duration - current_timestamp)
 
         return transcribed
 
@@ -157,11 +127,9 @@ class Transcriber:
 
                 chapter_segments: typing.List[Segment] = []
 
-                segments, _ = self.model.transcribe(
-                    audio=audio_chunk_path,
-                    initial_prompt=initial_prompt,
-                    vad_filter=True,
-                    word_timestamps=True,
+                segments = self.whisper_adapter.transcribe(
+                    audio_path=audio_chunk_path,
+                    initial_prompt=f"{initial_prompt} {chapter.title}",
                 )
                 for segment in segments:
                     aligned_segment = Segment(

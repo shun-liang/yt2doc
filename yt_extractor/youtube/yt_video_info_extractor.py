@@ -11,11 +11,8 @@ logger = logging.getLogger(__file__)
 
 
 class YtVideoInfoExtractor:
-    def __init__(
-        self, temp_dir: Path, video_processor: interfaces.IYtVideoInfoProcessor
-    ):
+    def __init__(self, temp_dir: Path):
         self.temp_dir = temp_dir
-        self.video_processor = video_processor
 
     def extract_video_info(self, video_url: str) -> interfaces.YtVideoInfo:
         ydl_opts = {
@@ -31,18 +28,11 @@ class YtVideoInfoExtractor:
         chapters = [interfaces.YtChapter(**chapter) for chapter in chapter_objects]
         description = response["description"]
 
-        processed_info = self.video_processor.process_video_info(
-            title=title, video_description=description
-        )
-
-        logger.info(f"processed video info: {processed_info}")
-
         return interfaces.YtVideoInfo(
             video_id=video_id,
             title=title,
             chapters=chapters,
             description=description,
-            processed_info=processed_info,
         )
 
     def extract_audio(self, video_url: str) -> Path:
