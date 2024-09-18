@@ -41,7 +41,8 @@ class WhisperCppAdapter:
     @staticmethod
     def _time_to_seconds(time_str: str) -> float:
         h, m, s = time_str.split(":")
-        return int(h) * 3600 + int(m) * 60 + float(s)
+        seconds = int(h) * 3600 + int(m) * 60 + float(s)
+        return round(seconds, 2)
 
     def _parse_whisper_line(self, line: str) -> interfaces.WhisperSegment:
         pattern = (
