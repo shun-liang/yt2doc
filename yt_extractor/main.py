@@ -142,7 +142,6 @@ def extract(
                 transcript_by_chapter = transcript_extractor.extract_by_chapter(
                     video_url=video_url, skip_cache=skip_cache
                 )
-                logger.info(f"transcript_by_chapter: {transcript_by_chapter}")
                 transcript_text = formatter.chaptered_transcript_to_markdown(
                     chaptered_transcript=transcript_by_chapter, is_root=True
                 )
