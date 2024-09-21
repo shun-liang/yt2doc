@@ -67,33 +67,6 @@ class Transcriber:
         ).output(file_path.as_posix()).run()
         return file_path
 
-    def transcribe_full_text(
-        self, audio_path: Path, video_info: youtube_interfaces.YtVideoInfo
-    ) -> str:
-        initial_prompt = self._get_initial_prompt(video_info=video_info)
-        audio_duration: float = float(ffmpeg.probe(audio_path)["format"]["duration"])
-        rounded_audio_duration = round(audio_duration, 2)
-        logger.info(f"Initial prompt: {initial_prompt}")
-        segments = self.whisper_adapter.transcribe(
-            audio_path=audio_path,
-            initial_prompt=initial_prompt,
-        )
-        transcribed = ""
-        current_timestamp = 0.0
-        with tqdm(
-            total=audio_duration,
-            unit=" audio seconds",
-            desc="Faster Whisper transcription",
-        ) as progress_bar:
-            for segment in segments:
-                transcribed += segment.text
-                progress_bar.update(segment.end - current_timestamp)
-                current_timestamp = segment.end
-            if current_timestamp < audio_duration:  # silence at the end of the audio
-                progress_bar.update(rounded_audio_duration - current_timestamp)
-
-        return transcribed
-
     def transcribe_by_chapter(
         self, audio_path: Path, video_info: youtube_interfaces.YtVideoInfo
     ) -> typing.Sequence[interfaces.ChapterTranscription]:
@@ -118,7 +91,7 @@ class Transcriber:
         with tqdm(
             total=rounded_full_audio_duration,
             unit=" audio seconds",
-            desc="Faster Whisper transcription",
+            desc="Transcription",
         ) as progress_bar:
             for chapter in chapters:
                 audio_chunk_path = self._get_audio_chunk_for_chapter(

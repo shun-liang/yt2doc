@@ -12,20 +12,19 @@ from wtpsplit import SaT
 
 from yt_extractor.youtube.yt_video_info_extractor import YtVideoInfoExtractor
 from yt_extractor.transcription.transcriber import Transcriber
-from yt_extractor.transcription.interfaces import IWhisperAdapter
+from yt_extractor.transcription import interfaces as transcription_interfaces
 from yt_extractor.transcription.whisper_cpp_adapter import WhisperCppAdapter
 from yt_extractor.transcription.faster_whisper_adapter import FasterWhisperAdapter
 from yt_extractor.extraction.file_cache import FileCache
-from yt_extractor.extraction.interfaces import MetaDict
+from yt_extractor.extraction import interfaces as extraction_interfaces
 from yt_extractor.extraction.extractor import Extractor
-from yt_extractor.extraction.formatter import Formatter
+from yt_extractor.formatting.formatter import MarkdownFormatter
+from yt_extractor.writer import IOWriter
 
 
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__file__)
-
-app = typer.Typer()
 
 DEFAULT_CACHE_PATH = Path.home() / ".yt-extractor"
 
@@ -35,20 +34,19 @@ class WhisperBackend(str, Enum):
     whisper_cpp = "whisper_cpp"
 
 
-@app.command()
-def extract(
+def main(
     video_url: typing.Optional[str] = typer.Option(
         None, "--video", help="URL of the video to extract"
     ),
     playlist_url: typing.Optional[str] = typer.Option(
         None, "--playlist", help="URL of the playlist to extract"
     ),
-    by_chapter: typing.Annotated[
-        bool,
-        typer.Option(
-            "--by-chapter", help="If should split the audio by YouTube video chapter"
-        ),
-    ] = False,
+    output_target: typing.Optional[str] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output file path",
+    ),
     whisper_backend: WhisperBackend = WhisperBackend.faster_whisper,
     faster_whisper_model_size: typing.Optional[str] = typer.Option(
         None, "--whisper-model", help="Whisper model to use for transcription"
@@ -72,8 +70,10 @@ def extract(
 ) -> None:
     DEFAULT_CACHE_PATH.mkdir(exist_ok=True)
 
-    whisper_adapter: IWhisperAdapter
-    meta: MetaDict
+    whisper_adapter: transcription_interfaces.IWhisperAdapter
+    meta: extraction_interfaces.MetaDict
+
+    io_writer = IOWriter()
 
     if whisper_backend is WhisperBackend.faster_whisper:
         if not faster_whisper_model_size:
@@ -120,7 +120,7 @@ def extract(
     )
 
     sat = SaT("sat-3l")
-    formatter = Formatter(sat=sat)
+    formatter = MarkdownFormatter(sat=sat)
 
     with tempfile.TemporaryDirectory() as temp_dir_name:
         temp_dir = Path(temp_dir_name)
@@ -138,60 +138,32 @@ def extract(
         if video_url:
             typer.echo(f"extracting video {video_url}", err=True)
 
-            if by_chapter:
-                transcript_by_chapter = transcript_extractor.extract_by_chapter(
-                    video_url=video_url, skip_cache=skip_cache
-                )
-                transcript_text = formatter.chaptered_transcript_to_markdown(
-                    chaptered_transcript=transcript_by_chapter, is_root=True
-                )
-
-            else:
-                transcript = transcript_extractor.extract(
-                    video_url=video_url, skip_cache=skip_cache
-                )
-                transcript_text = formatter.transcript_to_markdown(
-                    transcript=transcript, is_root=True
-                )
-
-            typer.echo(transcript_text)
+            transcript_by_chapter = transcript_extractor.extract_by_chapter(
+                video_url=video_url, skip_cache=skip_cache
+            )
+            formatted_transcript = formatter.format_chaptered_transcript(
+                chaptered_transcript=transcript_by_chapter
+            )
+            io_writer.write_video_transcript(
+                output_target=output_target, formatted_transcript=formatted_transcript
+            )
 
         elif playlist_url:
             typer.echo(f"extracting playlist {playlist_url}", err=True)
-            if by_chapter:
-                chaptered_transcribed_playlist = (
-                    transcript_extractor.extract_playlist_by_chapter(
-                        playlist_url=playlist_url, skip_cache=skip_cache
-                    )
+            chaptered_transcribed_playlist = (
+                transcript_extractor.extract_playlist_by_chapter(
+                    playlist_url=playlist_url, skip_cache=skip_cache
                 )
-                transcripts_text = formatter.chaptered_playlist_transcripts_to_markdown(
-                    chaptered_playlist=chaptered_transcribed_playlist
-                )
-            else:
-                transcripts_text = ""
-
-            typer.echo(transcripts_text)
-
+            )
+            formatted_playlist = formatter.format_chaptered_playlist_transcripts(
+                chaptered_playlist=chaptered_transcribed_playlist
+            )
+            io_writer.write_playlist(
+                output_target=output_target, formatted_playlist=formatted_playlist
+            )
         else:
             typer.echo("Please provide either --video or --playlist option", err=True)
 
 
-@app.command()
-def summarize(
-    video: typing.Optional[str] = typer.Option(
-        None, "--video", help="URL of the video to summarize"
-    ),
-    playlist: typing.Optional[str] = typer.Option(
-        None, "--playlist", help="URL of the playlist to summarize"
-    ),
-) -> None:
-    if video:
-        typer.echo(f"summarizing video {video}", err=True)
-    elif playlist:
-        typer.echo(f"summarizing playlist {playlist}", err=True)
-    else:
-        typer.echo("Please provide either --video or --playlist option", err=True)
-
-
 if __name__ == "__main__":
-    app()
+    typer.run(main)

@@ -19,45 +19,6 @@ class Extractor:
         self.transcriber = transcriber
         self.file_cache = file_cache
 
-    def extract(
-        self,
-        video_url: str,
-        skip_cache: bool,
-    ) -> interfaces.Transcript:
-        video_info = self.yt_dlp_adapter.extract_video_info(video_url=video_url)
-        if (
-            not skip_cache
-            and (
-                cached_transcript := self.file_cache.get_transcript(
-                    video_id=video_info.video_id
-                )
-            )
-            is not None
-        ):
-            return interfaces.Transcript(
-                url=video_url, title=video_info.title, text=cached_transcript
-            )
-
-        with Timer() as yt_dlp_timer:
-            audio_path = self.yt_dlp_adapter.extract_audio(video_url=video_url)
-
-        logger.info(f"Video download and convert time: {yt_dlp_timer.seconds} seconds")
-
-        with Timer() as transcribe_timer:
-            transcript = self.transcriber.transcribe_full_text(
-                audio_path=audio_path,
-                video_info=video_info,
-            )
-
-        logger.info(f"Transcription time: {transcribe_timer.seconds} seconds")
-
-        self.file_cache.cache_transcript(
-            video_id=video_info.video_id, transcript=transcript
-        )
-        return interfaces.Transcript(
-            url=video_url, title=video_info.title, text=transcript
-        )
-
     def extract_by_chapter(
         self,
         video_url: str,
