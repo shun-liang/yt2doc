@@ -229,6 +229,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a2/55/8f8cab2afd404cf578136ef2cc5dfb50baa1761b68c9da1fb1e4eed343c9/docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491", size = 25901 }
 
 [[package]]
+name = "emoji"
+version = "2.13.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/73/49/e456f5621ed86c8e77c343c9de2a3bfbcfb6dc88885d6e81feec030fd495/emoji-2.13.0.tar.gz", hash = "sha256:e32e46a1b4445dffbc37cc82ea2d0dacb9323b857f14297eba7decaadfb4890e", size = 562776 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9b/fa/f9ed99b289acddc28b79e41700db67abf48b91895c58e08520a304bbfb49/emoji-2.13.0-py3-none-any.whl", hash = "sha256:6c8027f02c448731fd5f13e38521e14594e48e9c5d2c3862f95d086d8aa84a7c", size = 553164 },
+]
+
+[[package]]
 name = "executing"
 version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1386,6 +1398,7 @@ name = "yt-extractor"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "emoji" },
     { name = "faster-whisper" },
     { name = "ffmpeg-python" },
     { name = "pydantic" },
@@ -1406,6 +1419,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "emoji", specifier = ">=2.13.0" },
     { name = "faster-whisper", specifier = ">=1.0.3" },
     { name = "ffmpeg-python", specifier = ">=0.2.0" },
     { name = "pydantic", specifier = ">=2.9.1" },

@@ -4,6 +4,7 @@ import logging
 
 import uuid
 import ffmpeg
+import emoji
 
 from pathlib import Path
 
@@ -51,6 +52,7 @@ class Transcriber:
         text = text.strip()
         text = re.sub(r"\n+| +", " ", text)
         text = text.replace(":", ".")
+        text = emoji.replace_emoji(text, "")
         return text
 
     def _get_initial_prompt(self, video_info: youtube_interfaces.YtVideoInfo) -> str:

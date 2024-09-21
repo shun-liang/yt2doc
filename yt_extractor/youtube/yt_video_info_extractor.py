@@ -1,3 +1,4 @@
+import typing
 import logging
 
 import yt_dlp
@@ -8,6 +9,38 @@ from yt_extractor.youtube import interfaces
 
 
 logger = logging.getLogger(__file__)
+
+
+def _length(chapter: interfaces.YtChapter) -> float:
+    return chapter.end_time - chapter.start_time
+
+
+def _merge_short_chapters(
+    chapters: typing.Sequence[interfaces.YtChapter],
+) -> typing.Sequence[interfaces.YtChapter]:
+    threshold_seconds = 60
+    merged_chapters: typing.List[interfaces.YtChapter] = []
+    for idx, chapter in enumerate(chapters):
+        if idx == 0:
+            merged_chapters.append(chapter)
+            continue
+
+        merged_target: interfaces.YtChapter
+        merged_target = merged_chapters[-1]
+        if (
+            _length(chapter) < threshold_seconds
+            and _length(merged_target) < threshold_seconds
+        ):
+            merged_chapter = interfaces.YtChapter(
+                title=merged_target.title + " & " + chapter.title,
+                start_time=merged_target.start_time,
+                end_time=chapter.end_time,
+            )
+            merged_chapters = merged_chapters[:-1] + [merged_chapter]
+        else:
+            merged_chapters.append(chapter)
+
+    return merged_chapters
 
 
 class YtVideoInfoExtractor:
@@ -25,7 +58,9 @@ class YtVideoInfoExtractor:
         video_id = response["id"]
         title = response["title"]
         chapter_objects = response["chapters"] if response["chapters"] else []
-        chapters = [interfaces.YtChapter(**chapter) for chapter in chapter_objects]
+        chapters = _merge_short_chapters(
+            [interfaces.YtChapter(**chapter) for chapter in chapter_objects]
+        )
         description = response["description"]
 
         return interfaces.YtVideoInfo(

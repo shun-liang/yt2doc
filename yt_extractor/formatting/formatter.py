@@ -13,6 +13,8 @@ class MarkdownFormatter:
         self.chapter_title_template = "## {name}"
 
     def _paragraph_text(self, text: str) -> str:
+        if len(text) < 15:
+            return text
         paragraphed_sentences: typing.List[typing.List[str]] = self.sat.split(
             text, do_paragraph_segmentation=True
         )
