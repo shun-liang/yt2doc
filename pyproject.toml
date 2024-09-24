@@ -8,6 +8,7 @@ dependencies = [
     "emoji>=2.13.0",
     "faster-whisper>=1.0.3",
     "ffmpeg-python>=0.2.0",
+    "pathvalidate>=3.2.1",
     "pydantic>=2.9.1",
     "torch>=2.4.1",
     "tqdm>=4.66.5",

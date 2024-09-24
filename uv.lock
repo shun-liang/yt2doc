@@ -715,6 +715,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pathvalidate"
+version = "3.2.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b4/8c/8713d8dcd8e357b9358695b441ee974580a8addfaea4f01437df07577052/pathvalidate-3.2.1.tar.gz", hash = "sha256:f5d07b1e2374187040612a1fcd2bcb2919f8db180df254c9581bb90bf903377d", size = 59263 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d3/5e/76a9d08b4b4e4583f269cb9f64de267f9aeae0dacef23307f53a14211716/pathvalidate-3.2.1-py3-none-any.whl", hash = "sha256:9a6255eb8f63c9e2135b9be97a5ce08f10230128c4ae7b3e935378b82b22c4c9", size = 23833 },
+]
+
+[[package]]
 name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1401,6 +1410,7 @@ dependencies = [
     { name = "emoji" },
     { name = "faster-whisper" },
     { name = "ffmpeg-python" },
+    { name = "pathvalidate" },
     { name = "pydantic" },
     { name = "torch" },
     { name = "tqdm" },
@@ -1422,6 +1432,7 @@ requires-dist = [
     { name = "emoji", specifier = ">=2.13.0" },
     { name = "faster-whisper", specifier = ">=1.0.3" },
     { name = "ffmpeg-python", specifier = ">=0.2.0" },
+    { name = "pathvalidate", specifier = ">=3.2.1" },
     { name = "pydantic", specifier = ">=2.9.1" },
     { name = "torch", specifier = ">=2.4.1" },
     { name = "tqdm", specifier = ">=4.66.5" },
