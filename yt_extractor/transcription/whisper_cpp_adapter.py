@@ -44,14 +44,14 @@ class WhisperCppAdapter:
         seconds = int(h) * 3600 + int(m) * 60 + float(s)
         return round(seconds, 2)
 
-    def _parse_whisper_line(self, line: str) -> interfaces.WhisperSegment:
+    def _parse_whisper_line(self, line: str) -> interfaces.Segment:
         pattern = (
             r"\[(\d{2}:\d{2}:\d{2}\.\d{3}) --> (\d{2}:\d{2}:\d{2}\.\d{3})\]\s{2}(.*)"
         )
         match = re.match(pattern, line)
         if match:
             start_time, end_time, text = match.groups()
-            return interfaces.WhisperSegment(
+            return interfaces.Segment(
                 start=self._time_to_seconds(start_time),
                 end=self._time_to_seconds(end_time),
                 text=text,
@@ -62,7 +62,7 @@ class WhisperCppAdapter:
 
     def transcribe(
         self, audio_path: Path, initial_prompt: str
-    ) -> typing.Iterable[interfaces.WhisperSegment]:
+    ) -> typing.Iterable[interfaces.Segment]:
         wav_audio_path = self._convert_audio_to_wav(audio_path=audio_path)
         proc = subprocess.Popen(
             [

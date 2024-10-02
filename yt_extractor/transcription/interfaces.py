@@ -7,24 +7,24 @@ from pydantic import BaseModel
 from yt_extractor.youtube import interfaces as youtube_interfaces
 
 
-class ChapterTranscription(BaseModel):
-    title: str
-    text: str
-
-
-class WhisperSegment(BaseModel):
+class Segment(BaseModel):
     start: float
     end: float
     text: str
 
 
+class ChapterTranscription(BaseModel):
+    title: str
+    segments: typing.Sequence[Segment]
+
+
 class IWhisperAdapter(typing.Protocol):
     def transcribe(
         self, audio_path: Path, initial_prompt: str
-    ) -> typing.Iterable[WhisperSegment]: ...
+    ) -> typing.Iterable[Segment]: ...
 
 
 class ITranscriber(typing.Protocol):
-    def transcribe_by_chapter(
+    def transcribe(
         self, audio_path: Path, video_info: youtube_interfaces.YtVideoInfo
     ) -> typing.Sequence[ChapterTranscription]: ...

@@ -49,8 +49,10 @@ class Extractor:
 
         with Timer() as transcribe_timer:
             transcripts_by_chapter = [
-                interfaces.TranscriptChapter(title=chapter.title, text=chapter.text)
-                for chapter in self.transcriber.transcribe_by_chapter(
+                interfaces.TranscriptChapter(
+                    title=chapter.title, segments=chapter.segments
+                )
+                for chapter in self.transcriber.transcribe(
                     audio_path=audio_path,
                     video_info=video_info,
                 )

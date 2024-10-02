@@ -1,10 +1,15 @@
 import typing
 import json
 import hashlib
+import logging
 
 from pathlib import Path
 
+from pydantic import ValidationError
+
 from yt_extractor.extraction import interfaces
+
+logger = logging.getLogger(__file__)
 
 
 class FileCache:
@@ -33,7 +38,13 @@ class FileCache:
         chapter_dicts: typing.List[typing.Dict[str, typing.Any]] = (
             chaptered_transcript_dict["chapters"]
         )
-        return [interfaces.TranscriptChapter(**chapter) for chapter in chapter_dicts]
+        try:
+            return [
+                interfaces.TranscriptChapter(**chapter) for chapter in chapter_dicts
+            ]
+        except ValidationError as e:
+            logger.warning(f"Validation error while trying to read from cache: {e}")
+            return None
 
     def cache_chaptered_transcript(
         self,
@@ -47,10 +58,7 @@ class FileCache:
         with open(file_path, "w+") as f:
             json.dump(
                 {
-                    "chapters": [
-                        {"title": chapter.title, "text": chapter.text}
-                        for chapter in chapters
-                    ],
+                    "chapters": [chapter.model_dump() for chapter in chapters],
                     "meta": self.meta,
                 },
                 f,

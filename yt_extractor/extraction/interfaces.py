@@ -2,10 +2,12 @@ import typing
 
 from pydantic import BaseModel
 
+from yt_extractor.transcription import interfaces as transcription_interfaces
+
 
 class TranscriptChapter(BaseModel):
     title: str
-    text: str
+    segments: typing.Sequence[transcription_interfaces.Segment]
 
 
 class ChapteredTranscript(BaseModel):

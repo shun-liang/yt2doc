@@ -18,12 +18,6 @@ from yt_extractor.transcription import interfaces
 logger = logging.getLogger(__file__)
 
 
-class Segment(BaseModel):
-    start: float
-    end: float
-    text: str
-
-
 class WhisperPrompt(BaseModel):
     fictitious_prompt: str
 
@@ -69,7 +63,7 @@ class Transcriber:
         ).output(file_path.as_posix()).run()
         return file_path
 
-    def transcribe_by_chapter(
+    def transcribe(
         self, audio_path: Path, video_info: youtube_interfaces.YtVideoInfo
     ) -> typing.Sequence[interfaces.ChapterTranscription]:
         initial_prompt = self._get_initial_prompt(video_info=video_info)
@@ -100,14 +94,14 @@ class Transcriber:
                     audio_path=audio_path, chapter=chapter
                 )
 
-                chapter_segments: typing.List[Segment] = []
+                chapter_segments: typing.List[interfaces.Segment] = []
 
                 segments = self.whisper_adapter.transcribe(
                     audio_path=audio_chunk_path,
                     initial_prompt=f"{initial_prompt} {chapter.title}",
                 )
                 for segment in segments:
-                    aligned_segment = Segment(
+                    aligned_segment = interfaces.Segment(
                         start=chapter.start_time + segment.start,
                         end=chapter.start_time + segment.end,
                         text=segment.text,
@@ -119,7 +113,7 @@ class Transcriber:
                 chaptered_transcriptions.append(
                     interfaces.ChapterTranscription(
                         title=chapter.title,
-                        text="".join(segment.text for segment in chapter_segments),
+                        segments=chapter_segments,
                     )
                 )
 

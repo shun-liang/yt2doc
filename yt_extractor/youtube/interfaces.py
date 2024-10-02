@@ -5,11 +5,6 @@ from pathlib import Path
 from pydantic import BaseModel
 
 
-class Speaker(BaseModel):
-    name: str
-    role: str
-
-
 class YtChapter(BaseModel):
     title: str
     start_time: float

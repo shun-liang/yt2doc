@@ -119,7 +119,7 @@ def main(
         meta=meta,
     )
 
-    sat = SaT("sat-3l")
+    sat = SaT("sat-9l")
     formatter = MarkdownFormatter(sat=sat)
 
     with tempfile.TemporaryDirectory() as temp_dir_name:

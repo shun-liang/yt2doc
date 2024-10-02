@@ -27,8 +27,10 @@ class MarkdownFormatter:
     ) -> interfaces.FormattedTranscript:
         chapter_and_text_list: typing.List[typing.Tuple[str, str]] = []
         for chapter in chaptered_transcript.chapters:
-            chapter_text = self._paragraph_text(chapter.text)
-            chapter_and_text_list.append((chapter.title, chapter_text))
+            chapter_text = self._paragraph_text(
+                "".join(s.text for s in chapter.segments)
+            )
+            chapter_and_text_list.append((chapter.title, chapter_text.strip()))
 
         transcript_text = "\n\n".join(
             [
