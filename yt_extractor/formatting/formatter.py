@@ -1,9 +1,12 @@
 import typing
+import logging
 
 from wtpsplit import SaT
 
 from yt_extractor.extraction import interfaces as extraction_interfaces
 from yt_extractor.formatting import interfaces
+
+logger = logging.getLogger(__file__)
 
 
 class MarkdownFormatter:
@@ -15,8 +18,9 @@ class MarkdownFormatter:
     def _paragraph_text(self, text: str) -> str:
         if len(text) < 15:
             return text
+        logger.info("Splitting text into paragraphs with Segment Any Text.")
         paragraphed_sentences: typing.List[typing.List[str]] = self.sat.split(
-            text, do_paragraph_segmentation=True
+            text, do_paragraph_segmentation=True, verbose=True
         )
         paragraphs = ["".join(sentences) for sentences in paragraphed_sentences]
         paragraphed_text = "\n\n".join(paragraphs)

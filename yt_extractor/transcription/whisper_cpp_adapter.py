@@ -21,6 +21,10 @@ class WhisperCppReturnNonZero(Exception):
     pass
 
 
+# TODO: Implement this properly once there is a Python binding of whisper.cpp
+# that treat CUDA and Apple Silicon / MPS as first class citizen
+# and does not require installing from source with special compiler flags
+# (e.g. [pywhispercpp](https://github.com/abdeladim-s/pywhispercpp)).
 class WhisperCppAdapter:
     def __init__(self, whisper_cpp_executable: Path, whisper_cpp_model: Path) -> None:
         self.whisper_cpp_executable = whisper_cpp_executable

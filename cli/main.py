@@ -3,30 +3,23 @@ import typing
 import logging
 
 import typer
-import faster_whisper
 
 from enum import Enum
 from pathlib import Path
 
-from wtpsplit import SaT
+import faster_whisper
 
-from yt_extractor.youtube.yt_video_info_extractor import YtVideoInfoExtractor
-from yt_extractor.transcription.transcriber import Transcriber
-from yt_extractor.transcription import interfaces as transcription_interfaces
-from yt_extractor.transcription.whisper_cpp_adapter import WhisperCppAdapter
-from yt_extractor.transcription.faster_whisper_adapter import FasterWhisperAdapter
-from yt_extractor.extraction.file_cache import FileCache
-from yt_extractor.extraction import interfaces as extraction_interfaces
-from yt_extractor.extraction.extractor import Extractor
-from yt_extractor.formatting.formatter import MarkdownFormatter
 from yt_extractor.writer import IOWriter
+from yt_extractor.extraction import interfaces as extraction_interfaces
+from yt_extractor.transcription.interfaces import IWhisperAdapter
+from yt_extractor.transcription.faster_whisper_adapter import FasterWhisperAdapter
+from yt_extractor.transcription.whisper_cpp_adapter import WhisperCppAdapter
+from yt_extractor.factories import get_yt2doc
 
 
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__file__)
-
-DEFAULT_CACHE_PATH = Path.home() / ".yt-extractor"
 
 
 class WhisperBackend(str, Enum):
@@ -63,17 +56,18 @@ def main(
         typing.Optional[Path], typer.Option()
     ] = None,
     whisper_cpp_model: typing.Annotated[typing.Optional[Path], typer.Option()] = None,
+    sat_model: str = typer.Option(
+        "sat-3l", "--sat-model", help="Segment Any Text model"
+    ),
     skip_cache: typing.Annotated[
         bool,
         typer.Option("--skip-cache", help="If should skip reading from cache"),
     ] = False,
 ) -> None:
-    DEFAULT_CACHE_PATH.mkdir(exist_ok=True)
-
-    whisper_adapter: transcription_interfaces.IWhisperAdapter
-    meta: extraction_interfaces.MetaDict
-
     io_writer = IOWriter()
+
+    whisper_adapter: IWhisperAdapter
+    meta: extraction_interfaces.MetaDict
 
     if whisper_backend is WhisperBackend.faster_whisper:
         if not faster_whisper_model_size:
@@ -114,49 +108,26 @@ def main(
             "whisper_cpp_model": whisper_cpp_model.resolve().as_posix(),
         }
 
-    file_cache = FileCache(
-        cache_dir=DEFAULT_CACHE_PATH,
-        meta=meta,
-    )
-
-    sat = SaT("sat-9l")
-    formatter = MarkdownFormatter(sat=sat)
-
     with tempfile.TemporaryDirectory() as temp_dir_name:
         temp_dir = Path(temp_dir_name)
-        video_info_extractor = YtVideoInfoExtractor(temp_dir=temp_dir)
-        transcriber = Transcriber(
-            temp_dir=temp_dir,
+        yt2doc = get_yt2doc(
             whisper_adapter=whisper_adapter,
-        )
-        transcript_extractor = Extractor(
-            video_info_extractor=video_info_extractor,
-            transcriber=transcriber,
-            file_cache=file_cache,
+            meta=meta,
+            sat_model=sat_model,
+            temp_dir=temp_dir,
         )
 
         if video_url:
-            typer.echo(f"extracting video {video_url}", err=True)
-
-            transcript_by_chapter = transcript_extractor.extract_by_chapter(
+            formatted_transcript = yt2doc.video_to_document(
                 video_url=video_url, skip_cache=skip_cache
-            )
-            formatted_transcript = formatter.format_chaptered_transcript(
-                chaptered_transcript=transcript_by_chapter
             )
             io_writer.write_video_transcript(
                 output_target=output_target, formatted_transcript=formatted_transcript
             )
 
         elif playlist_url:
-            typer.echo(f"extracting playlist {playlist_url}", err=True)
-            chaptered_transcribed_playlist = (
-                transcript_extractor.extract_playlist_by_chapter(
-                    playlist_url=playlist_url, skip_cache=skip_cache
-                )
-            )
-            formatted_playlist = formatter.format_chaptered_playlist_transcripts(
-                chaptered_playlist=chaptered_transcribed_playlist
+            formatted_playlist = yt2doc.playlist_to_documents(
+                playlist_url=playlist_url, skip_cache=skip_cache
             )
             io_writer.write_playlist(
                 output_target=output_target, formatted_playlist=formatted_playlist
