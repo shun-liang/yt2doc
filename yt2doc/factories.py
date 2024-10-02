@@ -4,14 +4,14 @@ from pathlib import Path
 
 from wtpsplit import SaT
 
-from yt_extractor.youtube.yt_video_info_extractor import YtVideoInfoExtractor
-from yt_extractor.transcription.transcriber import Transcriber
-from yt_extractor.transcription import interfaces as transcription_interfaces
-from yt_extractor.extraction.file_cache import FileCache
-from yt_extractor.extraction import interfaces as extraction_interfaces
-from yt_extractor.extraction.extractor import Extractor
-from yt_extractor.formatting.formatter import MarkdownFormatter
-from yt_extractor.yt2doc import Yt2Doc
+from yt2doc.youtube.yt_video_info_extractor import YtVideoInfoExtractor
+from yt2doc.transcription.transcriber import Transcriber
+from yt2doc.transcription import interfaces as transcription_interfaces
+from yt2doc.extraction.file_cache import FileCache
+from yt2doc.extraction import interfaces as extraction_interfaces
+from yt2doc.extraction.extractor import Extractor
+from yt2doc.formatting.formatter import MarkdownFormatter
+from yt2doc.yt2doc import Yt2Doc
 
 
 DEFAULT_CACHE_PATH = Path.home() / ".yt-extractor"

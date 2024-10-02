@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from yt_extractor.youtube import interfaces as youtube_interfaces
+from yt2doc.youtube import interfaces as youtube_interfaces
 
 
 class Segment(BaseModel):

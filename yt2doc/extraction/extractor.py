@@ -1,9 +1,9 @@
 import logging
 
-from yt_extractor.timer import Timer
-from yt_extractor.youtube import interfaces as youtube_interfaces
-from yt_extractor.transcription import interfaces as transcription_interfaces
-from yt_extractor.extraction import interfaces
+from yt2doc.timer import Timer
+from yt2doc.youtube import interfaces as youtube_interfaces
+from yt2doc.transcription import interfaces as transcription_interfaces
+from yt2doc.extraction import interfaces
 
 logger = logging.getLogger(__file__)
 

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pathvalidate import sanitize_filename
 
-from yt_extractor.formatting import interfaces as formatting_interfaces
+from yt2doc.formatting import interfaces as formatting_interfaces
 
 
 class IOException(Exception):

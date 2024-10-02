@@ -11,8 +11,8 @@ from pathlib import Path
 from tqdm import tqdm
 from pydantic import BaseModel
 
-from yt_extractor.youtube import interfaces as youtube_interfaces
-from yt_extractor.transcription import interfaces
+from yt2doc.youtube import interfaces as youtube_interfaces
+from yt2doc.transcription import interfaces
 
 
 logger = logging.getLogger(__file__)

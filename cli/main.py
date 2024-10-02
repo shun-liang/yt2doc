@@ -9,12 +9,12 @@ from pathlib import Path
 
 import faster_whisper
 
-from yt_extractor.writer import IOWriter
-from yt_extractor.extraction import interfaces as extraction_interfaces
-from yt_extractor.transcription.interfaces import IWhisperAdapter
-from yt_extractor.transcription.faster_whisper_adapter import FasterWhisperAdapter
-from yt_extractor.transcription.whisper_cpp_adapter import WhisperCppAdapter
-from yt_extractor.factories import get_yt2doc
+from yt2doc.writer import IOWriter
+from yt2doc.extraction import interfaces as extraction_interfaces
+from yt2doc.transcription.interfaces import IWhisperAdapter
+from yt2doc.transcription.faster_whisper_adapter import FasterWhisperAdapter
+from yt2doc.transcription.whisper_cpp_adapter import WhisperCppAdapter
+from yt2doc.factories import get_yt2doc
 
 
 logging.basicConfig(level=logging.INFO)
@@ -124,7 +124,6 @@ def main(
             io_writer.write_video_transcript(
                 output_target=output_target, formatted_transcript=formatted_transcript
             )
-
         elif playlist_url:
             formatted_playlist = yt2doc.playlist_to_documents(
                 playlist_url=playlist_url, skip_cache=skip_cache

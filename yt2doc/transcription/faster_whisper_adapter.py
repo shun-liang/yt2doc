@@ -4,7 +4,7 @@ from pathlib import Path
 
 from faster_whisper import WhisperModel
 
-from yt_extractor.transcription import interfaces
+from yt2doc.transcription import interfaces
 
 
 class FasterWhisperAdapter:

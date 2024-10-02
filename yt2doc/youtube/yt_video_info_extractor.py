@@ -5,7 +5,7 @@ import yt_dlp
 
 from pathlib import Path
 
-from yt_extractor.youtube import interfaces
+from yt2doc.youtube import interfaces
 
 
 logger = logging.getLogger(__file__)

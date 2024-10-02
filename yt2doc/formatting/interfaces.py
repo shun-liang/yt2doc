@@ -2,7 +2,7 @@ import typing
 
 from pydantic import BaseModel
 
-from yt_extractor.extraction import interfaces as extraction_interfaces
+from yt2doc.extraction import interfaces as extraction_interfaces
 
 
 class FormattedTranscript(BaseModel):

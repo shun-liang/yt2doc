@@ -2,7 +2,7 @@ import typing
 
 from pydantic import BaseModel
 
-from yt_extractor.transcription import interfaces as transcription_interfaces
+from yt2doc.transcription import interfaces as transcription_interfaces
 
 
 class TranscriptChapter(BaseModel):

@@ -7,7 +7,7 @@ import ffmpeg
 
 from pathlib import Path
 
-from yt_extractor.transcription import interfaces
+from yt2doc.transcription import interfaces
 
 
 logger = logging.getLogger(__file__)

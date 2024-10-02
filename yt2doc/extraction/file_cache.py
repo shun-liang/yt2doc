@@ -7,7 +7,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from yt_extractor.extraction import interfaces
+from yt2doc.extraction import interfaces
 
 logger = logging.getLogger(__file__)
 

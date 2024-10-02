@@ -1,7 +1,7 @@
 import logging
 
-from yt_extractor.extraction import interfaces as extraction_interfaces
-from yt_extractor.formatting import interfaces as formatting_interfaces
+from yt2doc.extraction import interfaces as extraction_interfaces
+from yt2doc.formatting import interfaces as formatting_interfaces
 
 logger = logging.getLogger(__file__)
 
