@@ -21,6 +21,10 @@ class WhisperCppReturnNonZero(Exception):
     pass
 
 
+class CannotDetectLanguage(Exception):
+    pass
+
+
 # TODO: Implement this properly once there is a Python binding of whisper.cpp
 # that treat CUDA and Apple Silicon / MPS as first class citizen
 # and does not require installing from source with special compiler flags
@@ -29,18 +33,6 @@ class WhisperCppAdapter:
     def __init__(self, whisper_cpp_executable: Path, whisper_cpp_model: Path) -> None:
         self.whisper_cpp_executable = whisper_cpp_executable
         self.whisper_cpp_model = whisper_cpp_model
-
-    @staticmethod
-    def _convert_audio_to_wav(audio_path: Path) -> Path:
-        audio_format: str = ffmpeg.probe(audio_path)["format"]["format_name"]
-        if audio_format == "wav":
-            return audio_path
-
-        wav_audio_path = audio_path.with_suffix(".wav")
-        ffmpeg.input(audio_path.as_posix()).output(
-            wav_audio_path.as_posix(), ar="16000", ac=1, acodec="pcm_s16le"
-        ).overwrite_output().run()
-        return wav_audio_path
 
     @staticmethod
     def _time_to_seconds(time_str: str) -> float:
@@ -64,17 +56,55 @@ class WhisperCppAdapter:
             f'Cannot parse whisper.cpp line: "{line}"'
         )
 
+    def detect_language(self, audio_path: Path) -> str:
+        result = subprocess.Popen(
+            [
+                self.whisper_cpp_executable,
+                "-m",
+                self.whisper_cpp_model,
+                "-f",
+                audio_path,
+                "--detect-language",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+        stderr = result.stderr
+        if stderr is None:
+            raise CannotDetectLanguage("stderr")
+
+        language_code_lines = [
+            line
+            for line in stderr
+            if line.startswith("whisper_full_with_state: auto-detected language")
+        ]
+        if len(language_code_lines) != 1:
+            raise CannotDetectLanguage(
+                f"Length of line containing language code in stderr is {len(language_code_lines)}"
+            )
+
+        language_code_line = language_code_lines[0]
+        pattern = r"whisper_full_with_state: auto-detected language: ([a-z]{2})"
+        match = re.search(pattern, language_code_line)
+        if match is None:
+            raise CannotDetectLanguage(
+                f"Unexpected matched language code line: {language_code_line}"
+            )
+        matched = match.group(1)
+        return str(matched)  # typing: ignore
+
     def transcribe(
         self, audio_path: Path, initial_prompt: str
     ) -> typing.Iterable[interfaces.Segment]:
-        wav_audio_path = self._convert_audio_to_wav(audio_path=audio_path)
         proc = subprocess.Popen(
             [
                 self.whisper_cpp_executable,
                 "-m",
                 self.whisper_cpp_model,
                 "-f",
-                wav_audio_path,
+                audio_path,
                 "--prompt",
                 initial_prompt,
             ],
@@ -87,7 +117,7 @@ class WhisperCppAdapter:
             for line in iter(proc.stdout.readline, ""):
                 if line in ["", "\n"]:
                     continue
-                yield self._parse_whisper_line(line)
+                    yield self._parse_whisper_line(line)
 
         output, error = proc.communicate()
         if proc.returncode != 0:

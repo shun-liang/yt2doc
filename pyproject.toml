@@ -14,7 +14,7 @@ dependencies = [
     "tqdm>=4.66.5",
     "typer-slim>=0.12.5",
     "wtpsplit>=2.0.8",
-    "yt-dlp>=2024.8.6",
+    "yt-dlp>=2024.9.27",
 ]
 
 [tool.uv]

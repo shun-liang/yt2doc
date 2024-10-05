@@ -11,6 +11,10 @@ class FasterWhisperAdapter:
     def __init__(self, whisper_model: WhisperModel) -> None:
         self.whisper_model = whisper_model
 
+    def detect_language(self, audio_path: Path) -> str:
+        _, info = self.whisper_model.transcribe(audio=audio_path)
+        return info.language  # type: ignore
+
     def transcribe(
         self, audio_path: Path, initial_prompt: str
     ) -> typing.Iterable[interfaces.Segment]:

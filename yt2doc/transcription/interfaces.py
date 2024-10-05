@@ -19,6 +19,8 @@ class ChapterTranscription(BaseModel):
 
 
 class IWhisperAdapter(typing.Protocol):
+    def detect_language(self, audio_path: Path) -> str: ...
+
     def transcribe(
         self, audio_path: Path, initial_prompt: str
     ) -> typing.Iterable[Segment]: ...
