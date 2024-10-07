@@ -3,8 +3,6 @@ import re
 import subprocess
 import typing
 
-import ffmpeg
-
 from pathlib import Path
 
 from yt2doc.transcription import interfaces
@@ -117,7 +115,7 @@ class WhisperCppAdapter:
             for line in iter(proc.stdout.readline, ""):
                 if line in ["", "\n"]:
                     continue
-                    yield self._parse_whisper_line(line)
+                yield self._parse_whisper_line(line)
 
         output, error = proc.communicate()
         if proc.returncode != 0:

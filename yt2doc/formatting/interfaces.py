@@ -5,6 +5,11 @@ from pydantic import BaseModel
 from yt2doc.extraction import interfaces as extraction_interfaces
 
 
+class Chapter(BaseModel):
+    title: str
+    text: str
+
+
 class FormattedTranscript(BaseModel):
     title: str
     transcript: str
@@ -13,6 +18,12 @@ class FormattedTranscript(BaseModel):
 class FormattedPlaylist(BaseModel):
     title: str
     transcripts: typing.Sequence[FormattedTranscript]
+
+
+class ITopicSegmenter(typing.Protocol):
+    def segment(
+        self, paragraphs: typing.Sequence[typing.List[str]]
+    ) -> typing.Sequence[Chapter]: ...
 
 
 class IFormatter(typing.Protocol):
