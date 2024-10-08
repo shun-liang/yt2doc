@@ -1,3 +1,4 @@
+import io
 import logging
 import re
 import subprocess
@@ -107,20 +108,31 @@ class WhisperCppAdapter:
                 initial_prompt,
             ],
             stdout=subprocess.PIPE,
-            text=True,
+            # text=True,
             bufsize=1,
         )
 
-        if proc.stdout is not None:
-            for line in iter(proc.stdout.readline, ""):
-                if line in ["", "\n"]:
-                    continue
-                yield self._parse_whisper_line(line)
+        stdout = proc.stdout
+        if stdout is None:
+            raise CannotParseWhisperCppLineException("stdout is None.")
+        for line in stdout:
+            try:
+                decoded_line = line.decode("utf-8")
+            except UnicodeDecodeError:
+                try:
+                    decoded_line = line.decode("latin-1")
+                except UnicodeDecodeError:
+                    logger.warning(f"Couldn't decode line: {line!r}")
+                continue
+
+            if decoded_line in ["", "\n"]:
+                continue
+            yield self._parse_whisper_line(decoded_line)
 
         output, error = proc.communicate()
         if proc.returncode != 0:
             raise WhisperCppReturnNonZero(
-                f'whisper.cpp command returned errored. output: "{output}", error: "{error}"'
+                f'whisper.cpp command returned errored. output: "{output!r}", error: "{error!r}"'
             )
 
         logger.info(error)
