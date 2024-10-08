@@ -40,6 +40,7 @@ class Extractor:
                 url=video_url,
                 title=video_info.title,
                 chapters=cached_chaptered_transcript,
+                chaptered_at_source=len(video_info.chapters) > 0,
             )
 
         with Timer() as yt_dlp_timer:
@@ -66,7 +67,10 @@ class Extractor:
         )
 
         return interfaces.ChapteredTranscript(
-            url=video_url, title=video_info.title, chapters=transcripts_by_chapter
+            url=video_url,
+            title=video_info.title,
+            chapters=transcripts_by_chapter,
+            chaptered_at_source=len(video_info.chapters) > 0,
         )
 
     def extract_playlist_by_chapter(

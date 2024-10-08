@@ -63,6 +63,12 @@ def main(
         bool,
         typer.Option("--skip-cache", help="If should skip reading from cache"),
     ] = False,
+    segment_unchaptered: typing.Annotated[
+        bool,
+        typer.Option(
+            "--segment-unchaptered", help="Segment unchaptered video by topic"
+        ),
+    ] = False,
 ) -> None:
     io_writer = IOWriter()
 
@@ -114,6 +120,7 @@ def main(
             whisper_adapter=whisper_adapter,
             meta=meta,
             sat_model=sat_model,
+            segment_unchaptered=segment_unchaptered,
             temp_dir=temp_dir,
         )
 

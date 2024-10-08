@@ -22,7 +22,7 @@ class FormattedPlaylist(BaseModel):
 
 class ITopicSegmenter(typing.Protocol):
     def segment(
-        self, paragraphs: typing.Sequence[typing.List[str]]
+        self, paragraphs: typing.List[typing.List[str]]
     ) -> typing.Sequence[Chapter]: ...
 
 

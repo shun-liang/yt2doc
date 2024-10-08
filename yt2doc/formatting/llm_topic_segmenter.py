@@ -3,6 +3,8 @@ import logging
 
 import instructor
 
+from tqdm import tqdm
+
 from yt2doc.formatting import interfaces
 
 logger = logging.getLogger(__file__)
@@ -42,7 +44,7 @@ class LLMTopicSegmenter:
     def segment(
         self, paragraphs: typing.List[typing.List[str]]
     ) -> typing.Sequence[interfaces.Chapter]:
-        group_size = 6
+        group_size = 8
         grouped_paragraphs_with_overlap = [
             (i, paragraphs[i : i + group_size])
             for i in range(0, len(paragraphs), group_size - 1)
@@ -51,10 +53,13 @@ class LLMTopicSegmenter:
             f"grouped_paragraphs_with_overlap: {grouped_paragraphs_with_overlap}"
         )
         topic_changed_indexes = []
-        for start_index, grouped_paragraphs in grouped_paragraphs_with_overlap:
-
+        for start_index, grouped_paragraphs in tqdm(
+            grouped_paragraphs_with_overlap, desc="Finding topic change points"
+        ):
+            truncate_sentence_index = 6
             truncated_grouped_paragraph_texts = [
-                "".join(paragraph[:6]) for paragraph in grouped_paragraphs
+                "".join(paragraph[:truncate_sentence_index])
+                for paragraph in grouped_paragraphs
             ]
             result = self.llm_client.chat.completions.create(
                 model=self.model,
@@ -77,9 +82,9 @@ class LLMTopicSegmenter:
                         "role": "user",
                         "content": """
                             {% for paragraph in paragraphs %}
-                            <paragraph {{ loop.index }}>
+                            <paragraph {{ loop.index0 }}>
                             {{ paragraph }}
-                            </ paragraph {{ loop.index }}>
+                            </ paragraph {{ loop.index0 }}>
                             {% endfor %}
                         """,
                     },
@@ -110,18 +115,16 @@ class LLMTopicSegmenter:
                 current_chapter_paragraphs = []
             current_chapter_paragraphs.append(paragraph)
         chapter_paragraphs.append(current_chapter_paragraphs)
-        # logger.info(chapter_paragraphs)
+
         chapter_texts: typing.List[str] = []
         for chapter in chapter_paragraphs:
-            chapter_text = ""
+            paragraphs_: typing.List[str] = []
             for paragraph in chapter:
                 paragraph_text = "".join(paragraph)
-                chapter_text = "\n\n".join([chapter_text, paragraph_text])
-            chapter_texts.append(chapter_text)
+                paragraphs_.append(paragraph_text)
+            chapter_texts.append("\n\n".join(paragraphs_))
         chapters = [
-            interfaces.Chapter(
-                title=self._get_title_for_chapter(text=text), text=text.strip()
-            )
+            interfaces.Chapter(title=self._get_title_for_chapter(text=text), text=text)
             for text in chapter_texts
         ]
         return chapters

@@ -14,6 +14,7 @@ class ChapteredTranscript(BaseModel):
     url: str
     title: str
     chapters: typing.Sequence[TranscriptChapter]
+    chaptered_at_source: bool
 
 
 class ChapteredTranscribedPlaylist(BaseModel):

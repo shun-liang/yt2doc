@@ -10,8 +10,13 @@ logger = logging.getLogger(__file__)
 
 
 class MarkdownFormatter:
-    def __init__(self, sat: SaT) -> None:
+    def __init__(
+        self,
+        sat: SaT,
+        topic_segmenter: typing.Optional[interfaces.ITopicSegmenter] = None,
+    ) -> None:
         self.sat = sat
+        self.topic_segmenter = topic_segmenter
         self.video_title_template = "# {name}"
         self.chapter_title_template = "## {name}"
 
@@ -30,11 +35,31 @@ class MarkdownFormatter:
         self, chaptered_transcript: extraction_interfaces.ChapteredTranscript
     ) -> interfaces.FormattedTranscript:
         chapter_and_text_list: typing.List[typing.Tuple[str, str]] = []
-        for chapter in chaptered_transcript.chapters:
-            chapter_text = self._paragraph_text(
-                "".join(s.text for s in chapter.segments)
+
+        if (
+            self.topic_segmenter is not None
+            and not chaptered_transcript.chaptered_at_source
+            and len(chaptered_transcript.chapters) == 1
+        ):
+            transcript_segments = chaptered_transcript.chapters[0].segments
+            full_text = "".join([segment.text for segment in transcript_segments])
+            logger.info(
+                "Splitting text into paragraphs with Segment Any Text for topic segmentation."
             )
-            chapter_and_text_list.append((chapter.title, chapter_text.strip()))
+            paragraphed_sentences: typing.List[typing.List[str]] = self.sat.split(
+                full_text, do_paragraph_segmentation=True, verbose=True
+            )
+            chapters = self.topic_segmenter.segment(paragraphs=paragraphed_sentences)
+            chapter_and_text_list = [
+                (chapter.title, chapter.text) for chapter in chapters
+            ]
+
+        else:
+            for chapter in chaptered_transcript.chapters:
+                chapter_text = self._paragraph_text(
+                    "".join(s.text for s in chapter.segments)
+                )
+                chapter_and_text_list.append((chapter.title, chapter_text.strip()))
 
         transcript_text = "\n\n".join(
             [
