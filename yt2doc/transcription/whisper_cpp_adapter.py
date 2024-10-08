@@ -108,7 +108,6 @@ class WhisperCppAdapter:
                 initial_prompt,
             ],
             stdout=subprocess.PIPE,
-            # text=True,
             bufsize=1,
         )
 

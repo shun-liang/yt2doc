@@ -15,7 +15,9 @@ class LLMTopicSegmenter:
         self.llm_client = llm_client
         self.model = model
 
-    def _get_title_for_chapter(self, text: str) -> str:
+    def _get_title_for_chapter(self, paragraphs: typing.List[typing.List[str]]) -> str:
+        truncated_paragraphs = [p[:10] for p in paragraphs]
+        truncated_text = "\n\n".join(["".join(p) for p in truncated_paragraphs])
         title = self.llm_client.chat.completions.create(
             model=self.model,
             response_model=str,
@@ -25,7 +27,7 @@ class LLMTopicSegmenter:
                     "content": """
                         Please generate a short title for the following text.
 
-                        Be very succinct. No more than 6 words.
+                        Be VERY SUCCINCT. No more than 6 words.
                     """,
                 },
                 {
@@ -36,7 +38,7 @@ class LLMTopicSegmenter:
                 },
             ],
             context={
-                "text": text,
+                "text": truncated_text,
             },
         )
         return title
@@ -102,7 +104,7 @@ class LLMTopicSegmenter:
             text = "\n\n".join(paragraph_texts)
             return [
                 interfaces.Chapter(
-                    title=self._get_title_for_chapter(text=text),
+                    title=self._get_title_for_chapter(paragraphs=paragraphs),
                     text=text,
                 )
             ]
@@ -116,15 +118,16 @@ class LLMTopicSegmenter:
             current_chapter_paragraphs.append(paragraph)
         chapter_paragraphs.append(current_chapter_paragraphs)
 
-        chapter_texts: typing.List[str] = []
-        for chapter in chapter_paragraphs:
+        chapter_titles_and_texts: typing.List[typing.Tuple[str, str]] = []
+        for chapter in tqdm(chapter_paragraphs, desc="Generating titles for chapters"):
             paragraphs_: typing.List[str] = []
             for paragraph in chapter:
                 paragraph_text = "".join(paragraph)
                 paragraphs_.append(paragraph_text)
-            chapter_texts.append("\n\n".join(paragraphs_))
+            title = self._get_title_for_chapter(paragraphs=chapter)
+            chapter_titles_and_texts.append((title, "\n\n".join(paragraphs_)))
         chapters = [
-            interfaces.Chapter(title=self._get_title_for_chapter(text=text), text=text)
-            for text in chapter_texts
+            interfaces.Chapter(title=title, text=text)
+            for title, text in chapter_titles_and_texts
         ]
         return chapters
