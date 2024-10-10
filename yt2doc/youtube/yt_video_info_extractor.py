@@ -57,7 +57,7 @@ class YtVideoInfoExtractor:
 
         video_id = response["id"]
         title = response["title"]
-        chapter_objects = response["chapters"] if response["chapters"] else []
+        chapter_objects = response.get("chapters") or []
         chapters = _merge_short_chapters(
             [interfaces.YtChapter(**chapter) for chapter in chapter_objects]
         )
