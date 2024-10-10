@@ -27,6 +27,10 @@ class IWhisperAdapter(typing.Protocol):
 
 
 class ITranscriber(typing.Protocol):
+    def transcribe_whole(
+        self, audio_path: Path, video_info: youtube_interfaces.YtVideoInfo
+    ) -> typing.Sequence[Segment]: ...
+
     def transcribe(
         self, audio_path: Path, video_info: youtube_interfaces.YtVideoInfo
     ) -> typing.Sequence[ChapterTranscription]: ...

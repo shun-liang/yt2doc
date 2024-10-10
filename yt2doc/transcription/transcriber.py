@@ -64,10 +64,6 @@ class Transcriber:
         text = re.sub(r"\n+| +", punctuations.white_space, text)
         text = text.replace(":", punctuations.comma)
         text = emoji.replace_emoji(text, "")
-        # non_char_symbol_pattern = (
-        #     f"[^\\w\\s{punctuations.comma}{punctuations.full_stop}]"
-        # )
-        # text = re.sub(non_char_symbol_pattern, "", text, flags=re.UNICODE)
         text = re.sub(r"\s+", punctuations.white_space, text).strip()
         text = unicodedata.normalize("NFKC", text)
 
@@ -131,6 +127,53 @@ class Transcriber:
             wav_audio_path.as_posix(), ar="16000", ac=1, acodec="pcm_s16le"
         ).overwrite_output().run()
         return wav_audio_path
+
+    def transcribe_whole(
+        self, audio_path: Path, video_info: youtube_interfaces.YtVideoInfo
+    ) -> typing.Sequence[interfaces.Segment]:
+        wav_audio_path = self._convert_audio_to_wav(audio_path=audio_path)
+        language_code = self.whisper_adapter.detect_language(audio_path=wav_audio_path)
+
+        initial_prompt = self._get_initial_prompt(
+            language_code=language_code,
+            video_info=video_info,
+        )
+        logger.info(f"Initial prompt: {initial_prompt}")
+
+        full_audio_duration: float = float(
+            ffmpeg.probe(wav_audio_path)["format"]["duration"]
+        )
+        rounded_full_audio_duration = round(full_audio_duration, 2)
+        current_timestamp = 0.0
+
+        with tqdm(
+            total=rounded_full_audio_duration,
+            unit=" audio seconds",
+            desc="Transcription",
+        ) as progress_bar:
+            whisper_segments = self.whisper_adapter.transcribe(
+                audio_path=audio_path,
+                initial_prompt=initial_prompt,
+            )
+            transcribed_segments: typing.List[interfaces.Segment] = []
+            for segment in whisper_segments:
+                aligned_segment = interfaces.Segment(
+                    start=segment.start,
+                    end=segment.end,
+                    text=self._fix_comma(
+                        segment_text=segment.text, language_code=language_code
+                    ),
+                )
+                transcribed_segments.append(aligned_segment)
+                progress_bar.update(aligned_segment.end - current_timestamp)
+                current_timestamp = aligned_segment.end
+
+            if (
+                current_timestamp < full_audio_duration
+            ):  # silence at the end of the audio
+                progress_bar.update(full_audio_duration - current_timestamp)
+
+            return transcribed_segments
 
     def transcribe(
         self, audio_path: Path, video_info: youtube_interfaces.YtVideoInfo
