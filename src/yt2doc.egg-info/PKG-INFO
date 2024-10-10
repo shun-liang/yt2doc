@@ -1,7 +1,7 @@
 Metadata-Version: 2.1
-Name: yt-extractor
+Name: yt2doc
 Version: 0.1.0
-Summary: Add your description here
+Summary: Transcribe any YouTube video into a structural Markdown document
 Requires-Python: >=3.12
 Description-Content-Type: text/markdown
 License-File: LICENSE
