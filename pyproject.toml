@@ -1,7 +1,7 @@
 [project]
-name = "yt-extractor"
+name = "yt2doc"
 version = "0.1.0"
-description = "Add your description here"
+description = "Transcribe any YouTube video into a structural Markdown document"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -35,3 +35,9 @@ module = [
     "wtpsplit",
 ]
 ignore_missing_imports = true
+
+[project.scripts]
+yt2doc = "yt2doc.cli:app"
+
+[project.entry-points."pipx.run"]
+yt2doc = "yt2doc.cli:app"

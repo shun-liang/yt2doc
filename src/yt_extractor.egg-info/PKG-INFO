@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: yt-extractor
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: emoji>=2.13.0
+Requires-Dist: faster-whisper>=1.0.3
+Requires-Dist: ffmpeg-python>=0.2.0
+Requires-Dist: instructor>=1.5.1
+Requires-Dist: openai>=1.51.0
+Requires-Dist: pathvalidate>=3.2.1
+Requires-Dist: pydantic>=2.9.1
+Requires-Dist: torch>=2.4.1
+Requires-Dist: tqdm>=4.66.5
+Requires-Dist: typer-slim>=0.12.5
+Requires-Dist: wtpsplit>=2.0.8
+Requires-Dist: yt-dlp>=2024.9.27

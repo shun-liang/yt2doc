@@ -141,6 +141,8 @@ def main(
         else:
             typer.echo("Please provide either --video or --playlist option", err=True)
 
+app = typer.Typer()
+app.command()(main)
 
 if __name__ == "__main__":
-    typer.run(main)
+    app()
