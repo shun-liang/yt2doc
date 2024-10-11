@@ -1,5 +1,0 @@
-[console_scripts]
-yt2doc = yt2doc.cli:app
-
-[pipx.run]
-yt2doc = yt2doc.cli:app
