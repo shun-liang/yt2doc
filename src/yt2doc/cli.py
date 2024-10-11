@@ -59,6 +59,11 @@ def main(
     sat_model: str = typer.Option(
         "sat-3l", "--sat-model", help="Segment Any Text model"
     ),
+    llm_model: typing.Optional[str] = typer.Option(
+        None,
+        "--llm-model",
+        help="LLM model for finding text boundaries and title generation",
+    ),
     skip_cache: typing.Annotated[
         bool,
         typer.Option("--skip-cache", help="If should skip reading from cache"),
@@ -121,6 +126,7 @@ def main(
             meta=meta,
             sat_model=sat_model,
             segment_unchaptered=segment_unchaptered,
+            llm_model=llm_model,
             temp_dir=temp_dir,
         )
 
@@ -140,6 +146,7 @@ def main(
             )
         else:
             typer.echo("Please provide either --video or --playlist option", err=True)
+
 
 app = typer.Typer()
 app.command()(main)
