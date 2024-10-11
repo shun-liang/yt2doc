@@ -3,6 +3,7 @@ import logging
 
 import instructor
 
+from pydantic import BaseModel, AfterValidator
 from tqdm import tqdm
 
 from yt2doc.formatting import interfaces
@@ -63,9 +64,26 @@ class LLMTopicSegmenter:
                 "".join(paragraph[:truncate_sentence_index])
                 for paragraph in grouped_paragraphs
             ]
+
+            def validate_paragraph_indexes(v: typing.List[int]) -> typing.List[int]:
+                n = len(truncated_grouped_paragraph_texts)
+                unique_values = set(v)
+                if len(unique_values) != len(v):
+                    raise ValueError("All elements must be unique")
+                if any(i <= 0 or i >= n for i in v):
+                    raise ValueError(
+                        f"All elements must be greater than 0 and less than {n}"
+                    )
+                return v
+
+            class Result(BaseModel):
+                paragraph_indexes: typing.Annotated[
+                    typing.List[int], AfterValidator(validate_paragraph_indexes)
+                ]
+
             result = self.llm_client.chat.completions.create(
                 model=self.model,
-                response_model=typing.List[int],
+                response_model=Result,
                 messages=[
                     {
                         "role": "system",
@@ -96,7 +114,9 @@ class LLMTopicSegmenter:
                 },
             )
             logger.info(f"paragraph indexes from LLM: {result}")
-            aligned_indexes = [start_index + index for index in result]
+            aligned_indexes = [
+                start_index + index for index in sorted(result.paragraph_indexes)
+            ]
             topic_changed_indexes += aligned_indexes
 
         if len(topic_changed_indexes) == 0:
