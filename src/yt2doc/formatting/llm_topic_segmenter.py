@@ -3,6 +3,7 @@ import logging
 
 import instructor
 
+from pydantic import conint
 from tqdm import tqdm
 
 from yt2doc.formatting import interfaces
@@ -63,9 +64,12 @@ class LLMTopicSegmenter:
                 "".join(paragraph[:truncate_sentence_index])
                 for paragraph in grouped_paragraphs
             ]
+
+            ParagraphIndex = conint(gt=0, lt=len(truncated_grouped_paragraph_texts))
             result = self.llm_client.chat.completions.create(
                 model=self.model,
-                response_model=typing.List[int],
+                # See https://github.com/pydantic/pydantic/issues/156
+                response_model=typing.Set[ParagraphIndex],  # type: ignore[valid-type]
                 messages=[
                     {
                         "role": "system",
@@ -96,7 +100,7 @@ class LLMTopicSegmenter:
                 },
             )
             logger.info(f"paragraph indexes from LLM: {result}")
-            aligned_indexes = [start_index + index for index in result]
+            aligned_indexes = [start_index + index for index in sorted(list(result))]
             topic_changed_indexes += aligned_indexes
 
         if len(topic_changed_indexes) == 0:
