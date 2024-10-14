@@ -1,6 +1,6 @@
 # yt2doc
 
-yt2doc transcribes videos online into structural documents in Markdown format.
+yt2doc transcribes videos online into readable Markdown documents.
 
 Supported video sources:
 * YouTube
@@ -41,7 +41,7 @@ To save your transcription:
 yt2doc --video <video-url> -o some_dir/transcription.md
 ```
 
-To transcribe all videos in a Youtube playlist:
+To transcribe all videos from a YouTube playlist:
 
 ```
 yt2doc --playlist <playlist-url> -o some_dir
@@ -70,5 +70,5 @@ List of available SaT models [here](https://github.com/segment-any-text/wtpsplit
 
 ## TODOs
 * Tests and evaluation
-* CICD
 * Better whisper prompting strategy (right now hugely depend on the title and the description of the video).
+* Better support for non-English languages
