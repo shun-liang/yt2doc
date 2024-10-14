@@ -13,6 +13,6 @@ jobs:
       - name: Install dependencies
         run: uv sync
       - name: Run mypy
-        run: python -m mypy --strict src
+        run: uv run mypy --strict src
       - name: Run ruff check
-        run: python -m ruff check
+        run: uv run ruff check
