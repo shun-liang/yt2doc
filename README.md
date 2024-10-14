@@ -6,8 +6,6 @@ Supported video sources:
 * YouTube
 * Twitter
 
-yt2doc is meant to work fully locally, without invoking any external API. The OpenAI SDK dependency is required solely to interact with [Ollama](https://github.com/ollama/ollama).
-
 ## Installation
 
 Install with [pipx](https://github.com/pypa/pipx):
@@ -41,7 +39,7 @@ To save your transcription:
 yt2doc --video <video-url> -o some_dir/transcription.md
 ```
 
-To transcribe all videos in a Youtube playlist:
+To transcribe all videos from a YouTube playlist:
 
 ```
 yt2doc --playlist <playlist-url> -o some_dir
@@ -53,7 +51,7 @@ yt2doc --playlist <playlist-url> -o some_dir
 yt2doc --video <video-url> --segment-unchaptered --llm-model <model-name>
 ```
 
-Among smaller size models, `qwen 2.5` 7b seems works best.
+`llama 3.1:8b, qwen2.5 7b, gemma 9b` are among the smaller models that perform reasonably good.
 
 For MacOS devices running Apple Silicon, (a hacky) support for [whisper.cpp](https://github.com/ggerganov/whisper.cpp) is supported:
 
@@ -70,5 +68,5 @@ List of available SaT models [here](https://github.com/segment-any-text/wtpsplit
 
 ## TODOs
 * Tests and evaluation
-* CICD
 * Better whisper prompting strategy (right now hugely depend on the title and the description of the video).
+* Better support for non-English languages
