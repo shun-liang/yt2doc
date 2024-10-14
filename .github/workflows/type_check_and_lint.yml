@@ -1,9 +1,6 @@
 name: Type check and lint
 
-on:
-  push:
-    paths:
-      - '*.py'
+on: push
 
 jobs:
   mypy:
