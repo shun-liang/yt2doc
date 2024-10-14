@@ -104,10 +104,10 @@ def main(
         }
     else:
         if whisper_cpp_executable is None:
-            typer.echo(f"--whisper-cpp-executable must be provided.", err=True)
+            typer.echo("--whisper-cpp-executable must be provided.", err=True)
             raise typer.Abort()
         if whisper_cpp_model is None:
-            typer.echo(f"--whisper-cpp-model must be provided.", err=True)
+            typer.echo("--whisper-cpp-model must be provided.", err=True)
             raise typer.Abort()
         whisper_adapter = WhisperCppAdapter(
             whisper_cpp_executable=whisper_cpp_executable,

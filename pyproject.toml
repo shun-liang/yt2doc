@@ -3,7 +3,7 @@ name = "yt2doc"
 version = "0.1.2"
 description = "Transcribe any YouTube video into a structural Markdown document"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "emoji>=2.13.0",
     "faster-whisper>=1.0.3",
