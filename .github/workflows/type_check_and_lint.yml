@@ -1,0 +1,23 @@
+name: Type check and lint
+
+on:
+  push:
+    paths:
+      - '*.py'
+
+jobs:
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+      - name: Set up Python
+        run: uv python install 3.12
+      - name: Install dependencies
+        run: uv sync
+      - name: Run mypy
+        run: mypy --strict src
+      - name: Run ruff check
+        run: ruff check
