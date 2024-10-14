@@ -1,4 +1,3 @@
-import io
 import logging
 import re
 import subprocess
