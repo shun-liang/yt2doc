@@ -2356,7 +2356,7 @@ wheels = [
 
 [[package]]
 name = "yt-dlp"
-version = "2024.9.27"
+version = "2024.10.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "brotli", marker = "implementation_name == 'cpython'" },
@@ -2368,9 +2368,9 @@ dependencies = [
     { name = "urllib3" },
     { name = "websockets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7d/3f/c63b11419d7adacde35b39e7e62aef1be6ce9ff3d2219fae024962ab4a53/yt_dlp-2024.9.27.tar.gz", hash = "sha256:86605542e17e2e23ad23145b637ec308133762a15a5dedac4ae50b7973237026", size = 2876534 }
+sdist = { url = "https://files.pythonhosted.org/packages/2e/b1/08679efb4c1932dc6420deda8a89f03d7440d6462b7f61d339db2732a497/yt_dlp-2024.10.7.tar.gz", hash = "sha256:0baf1ab517c9748d7e337ced91c5543c36fc16246a9ebedac32ebf20c1998ceb", size = 2877443 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c6/26/5dc3a802bd85c19d3d2fa746e6b36979801e2f32a433799c57f646335a7d/yt_dlp-2024.9.27-py3-none-any.whl", hash = "sha256:2717468dd697fcfcf9a89f493ba30a3830cdfb276c09750e5b561b08b9ef5f69", size = 3148509 },
+    { url = "https://files.pythonhosted.org/packages/6e/91/ecb07d66110334cdb01e94b187577af3b041897090203c9957728825d46f/yt_dlp-2024.10.7-py3-none-any.whl", hash = "sha256:9e336ae663bfd7ad3ea1c02e722747388172719efc0fc39a807dace3073aa704", size = 3149082 },
 ]
 
 [[package]]
@@ -2413,7 +2413,7 @@ requires-dist = [
     { name = "tqdm", specifier = ">=4.66.5" },
     { name = "typer-slim", specifier = ">=0.12.5" },
     { name = "wtpsplit", specifier = ">=2.0.8" },
-    { name = "yt-dlp", specifier = ">=2024.9.27" },
+    { name = "yt-dlp", specifier = ">=2024.10.7" },
 ]
 
 [package.metadata.requires-dev]
