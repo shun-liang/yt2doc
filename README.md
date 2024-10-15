@@ -18,6 +18,23 @@ There have been many existing projects that transcribe YouTube videos with Whisp
 
 ## Installation
 
+### Prerequisites
+
+[ffmepg](https://www.ffmpeg.org/) is required to run yt2doc. If you are on
+
+If you are running MacOS:
+
+```
+brew install ffmpeg
+```
+
+If you are on Debian/Ubuntu:
+```
+sudo apt install ffmpeg
+```
+
+### Install yt2doc
+
 Install with [pipx](https://github.com/pypa/pipx):
 
 ```
