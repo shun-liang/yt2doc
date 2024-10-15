@@ -53,7 +53,7 @@ yt2doc --playlist <playlist-url> -o some_dir
 yt2doc --video <video-url> --segment-unchaptered --llm-model <model-name>
 ```
 
-Among smaller size models, `qwen 2.5` 7b seems works best.
+Among smaller size models, `gemma2:9b`, `llama3.1:8b`, and `qwen 2.5:7b` work reasonably well.
 
 For MacOS devices running Apple Silicon, (a hacky) support for [whisper.cpp](https://github.com/ggerganov/whisper.cpp) is supported:
 
