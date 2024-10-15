@@ -8,6 +8,10 @@ Supported video sources:
 
 yt2doc is meant to work fully locally, without invoking any external API. The OpenAI SDK dependency is required solely to interact with [Ollama](https://github.com/ollama/ollama).
 
+## Why
+
+There have been many existing projects that transcribe YouTube videos with Whisper and its variants, but most of them aimed to generate subtitles, while I had not found one that priortises readability. Whisper does not generate line break in its transcription, so transcribing a 20 mins long video without any post processing would give you a huge piece of text, without any line break and topic segmentation. This project aims to transcribe videos with that post processing. 
+
 ## Installation
 
 Install with [pipx](https://github.com/pypa/pipx):
