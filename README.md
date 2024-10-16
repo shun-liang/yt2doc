@@ -6,6 +6,7 @@ yt2doc transcribes videos online into readable Markdown documents.
 
 Supported video sources:
 * YouTube
+* Apple Podcast
 * Twitter
 
 yt2doc is meant to work fully locally, without invoking any external API. The OpenAI SDK dependency is required solely to interact with [Ollama](https://github.com/ollama/ollama).

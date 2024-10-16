@@ -13,6 +13,7 @@ class TranscriptChapter(BaseModel):
 class ChapteredTranscript(BaseModel):
     url: str
     title: str
+    language: str
     chapters: typing.Sequence[TranscriptChapter]
     chaptered_at_source: bool
 
@@ -29,11 +30,11 @@ MetaDict = typing.Dict[str, typing.Union[str, int, float]]
 class IFileCache(typing.Protocol):
     def get_chaptered_transcript(
         self, video_id: str
-    ) -> typing.Optional[typing.Sequence[TranscriptChapter]]: ...
+    ) -> typing.Optional[ChapteredTranscript]: ...
     def cache_chaptered_transcript(
         self,
         video_id: str,
-        chapters: typing.Sequence[TranscriptChapter],
+        transcript: ChapteredTranscript,
     ) -> None: ...
 
 

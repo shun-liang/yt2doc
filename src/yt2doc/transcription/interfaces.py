@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from yt2doc.youtube import interfaces as youtube_interfaces
+from yt2doc.media import interfaces as youtube_interfaces
 
 
 class Segment(BaseModel):
@@ -18,6 +18,11 @@ class ChapterTranscription(BaseModel):
     segments: typing.Sequence[Segment]
 
 
+class Transcription(BaseModel):
+    language: str
+    chapters: typing.Sequence[ChapterTranscription]
+
+
 class IWhisperAdapter(typing.Protocol):
     def detect_language(self, audio_path: Path) -> str: ...
 
@@ -28,5 +33,5 @@ class IWhisperAdapter(typing.Protocol):
 
 class ITranscriber(typing.Protocol):
     def transcribe(
-        self, audio_path: Path, video_info: youtube_interfaces.YtVideoInfo
-    ) -> typing.Sequence[ChapterTranscription]: ...
+        self, audio_path: Path, video_info: youtube_interfaces.MediaInfo
+    ) -> Transcription: ...

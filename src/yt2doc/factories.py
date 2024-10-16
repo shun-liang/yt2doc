@@ -6,7 +6,7 @@ import instructor
 from wtpsplit import SaT
 from openai import OpenAI
 
-from yt2doc.youtube.yt_video_info_extractor import YtVideoInfoExtractor
+from yt2doc.media.media_info_extractor import MediaInfoExtractor
 from yt2doc.transcription.transcriber import Transcriber
 from yt2doc.transcription import interfaces as transcription_interfaces
 from yt2doc.extraction.file_cache import FileCache
@@ -57,7 +57,7 @@ def get_yt2doc(
     else:
         formatter = MarkdownFormatter(sat=sat)
 
-    video_info_extractor = YtVideoInfoExtractor(temp_dir=temp_dir)
+    video_info_extractor = MediaInfoExtractor(temp_dir=temp_dir)
     transcriber = Transcriber(
         temp_dir=temp_dir,
         whisper_adapter=whisper_adapter,

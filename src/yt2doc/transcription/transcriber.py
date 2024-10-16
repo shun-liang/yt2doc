@@ -10,26 +10,13 @@ import emoji
 from pathlib import Path
 
 from tqdm import tqdm
-from pydantic import BaseModel
 
-from yt2doc.youtube import interfaces as youtube_interfaces
+from yt2doc.media import interfaces as youtube_interfaces
 from yt2doc.transcription import interfaces
+from yt2doc.i18n import punctuations
 
 
 logger = logging.getLogger(__file__)
-
-
-class Punctuations(BaseModel):
-    full_stop: str
-    comma: str
-    white_space: str
-
-
-PUNCTUATIONS_IN_LANGUAGES: typing.Dict[str, Punctuations] = {
-    "en": Punctuations(full_stop=".", comma=", ", white_space=" "),
-    "zh": Punctuations(full_stop="。", comma="，", white_space=""),
-    "jp": Punctuations(full_stop="。", comma="、", white_space=""),
-}
 
 
 class Transcriber:
@@ -42,20 +29,17 @@ class Transcriber:
         self.whisper_adapter = whisper_adapter
 
     @staticmethod
-    def _get_punctuations(language_code: str) -> Punctuations:
-        if language_code not in PUNCTUATIONS_IN_LANGUAGES.keys():
-            return PUNCTUATIONS_IN_LANGUAGES["en"]
-        return PUNCTUATIONS_IN_LANGUAGES[language_code]
-
-    @staticmethod
-    def _clean_video_description(description: str, punctuations: Punctuations) -> str:
+    def _clean_video_description(
+        description: str, punctuations: punctuations.Punctuations
+    ) -> str:
         url_pattern = r"https?://\S+"
-        timestamp_line_pattern = r"^\d+:\d+.*\n?"
+        timestamp_min_sec_pattern = r"\d\d:\d\d"
+        timestamp_hr_min_sec_pattern = r"\d\d:\d\d:\d\d"
         hashtag_pattern = r"#\w+"
         normalized_text = unicodedata.normalize("NFKD", description)
 
         text = re.sub(
-            f"{url_pattern}|{timestamp_line_pattern}|{hashtag_pattern}",
+            f"{url_pattern}|{timestamp_hr_min_sec_pattern}|{timestamp_min_sec_pattern}|{hashtag_pattern}",
             "",
             normalized_text,
             flags=re.MULTILINE,
@@ -64,21 +48,19 @@ class Transcriber:
         text = re.sub(r"\n+| +", punctuations.white_space, text)
         text = text.replace(":", punctuations.comma)
         text = emoji.replace_emoji(text, "")
-        # non_char_symbol_pattern = (
-        #     f"[^\\w\\s{punctuations.comma}{punctuations.full_stop}]"
-        # )
-        # text = re.sub(non_char_symbol_pattern, "", text, flags=re.UNICODE)
+
+        non_char_symbol_pattern = f"[^\\w\\s{punctuations.comma}{punctuations.full_stop}{punctuations.question_mark}{punctuations.exclamation_mark}]"
+        text = re.sub(non_char_symbol_pattern, "", text, flags=re.UNICODE)
+
         text = re.sub(r"\s+", punctuations.white_space, text).strip()
         text = unicodedata.normalize("NFKC", text)
 
         return text
 
     @staticmethod
-    def _clean_title(title: str, punctuations: Punctuations) -> str:
+    def _clean_title(title: str, punctuations: punctuations.Punctuations) -> str:
         normalized_text = unicodedata.normalize("NFKD", title)
-        non_char_symbol_pattern = (
-            f"[^\\w\\s{punctuations.comma}{punctuations.full_stop}]"
-        )
+        non_char_symbol_pattern = f"[^\\w\\s{punctuations.comma}{punctuations.full_stop}{punctuations.question_mark}{punctuations.exclamation_mark}]"
         text = re.sub(non_char_symbol_pattern, "", normalized_text, flags=re.UNICODE)
         text = re.sub(r"\s+", punctuations.white_space, text).strip()
         text = unicodedata.normalize("NFKC", text)
@@ -87,24 +69,23 @@ class Transcriber:
     def _get_initial_prompt(
         self,
         language_code: str,
-        video_info: youtube_interfaces.YtVideoInfo,
+        video_info: youtube_interfaces.MediaInfo,
     ) -> str:
-        punctuations = self._get_punctuations(language_code=language_code)
+        punctuations_ = punctuations.get_punctuations(language_code=language_code)
         cleaned_title = self._clean_title(
             title=video_info.title,
-            punctuations=punctuations,
+            punctuations=punctuations_,
         )
         cleaned_video_description = self._clean_video_description(
-            video_info.description, punctuations=punctuations
+            video_info.description, punctuations=punctuations_
         )
-        punctuations = self._get_punctuations(language_code=language_code)
-        chapter_titles = f"{punctuations.comma}".join(
+        chapter_titles = f"{punctuations_.comma}".join(
             c.title for c in video_info.chapters
         )
-        return f"{cleaned_title}{punctuations.full_stop} {cleaned_video_description} {chapter_titles}"
+        return f"{cleaned_title}{punctuations_.full_stop} {cleaned_video_description} {chapter_titles}"
 
     def _get_audio_chunk_for_chapter(
-        self, audio_path: Path, chapter: youtube_interfaces.YtChapter
+        self, audio_path: Path, chapter: youtube_interfaces.MediaChapter
     ) -> Path:
         duration = chapter.end_time - chapter.start_time
         ext = audio_path.suffix
@@ -116,8 +97,8 @@ class Transcriber:
 
     def _fix_comma(self, segment_text: str, language_code: str) -> str:
         if language_code in ["zh"]:
-            punctuations = self._get_punctuations(language_code=language_code)
-            return segment_text.replace(",", punctuations.comma)
+            punctuations_ = punctuations.get_punctuations(language_code=language_code)
+            return segment_text.replace(",", punctuations_.comma)
         return segment_text
 
     @staticmethod
@@ -133,8 +114,8 @@ class Transcriber:
         return wav_audio_path
 
     def transcribe(
-        self, audio_path: Path, video_info: youtube_interfaces.YtVideoInfo
-    ) -> typing.Sequence[interfaces.ChapterTranscription]:
+        self, audio_path: Path, video_info: youtube_interfaces.MediaInfo
+    ) -> interfaces.Transcription:
         wav_audio_path = self._convert_audio_to_wav(audio_path=audio_path)
 
         language_code = self.whisper_adapter.detect_language(audio_path=wav_audio_path)
@@ -156,7 +137,7 @@ class Transcriber:
             chapters = video_info.chapters
         else:
             chapters = [
-                youtube_interfaces.YtChapter(
+                youtube_interfaces.MediaChapter(
                     title="Untitled chapter",
                     start_time=0.0,
                     end_time=full_audio_duration,
@@ -202,4 +183,7 @@ class Transcriber:
             ):  # silence at the end of the audio
                 progress_bar.update(full_audio_duration - current_timestamp)
 
-        return chaptered_transcriptions
+        return interfaces.Transcription(
+            language=language_code,
+            chapters=chaptered_transcriptions,
+        )

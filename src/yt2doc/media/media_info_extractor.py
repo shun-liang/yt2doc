@@ -5,33 +5,33 @@ import yt_dlp
 
 from pathlib import Path
 
-from yt2doc.youtube import interfaces
+from yt2doc.media import interfaces
 
 
 logger = logging.getLogger(__file__)
 
 
-def _length(chapter: interfaces.YtChapter) -> float:
+def _length(chapter: interfaces.MediaChapter) -> float:
     return chapter.end_time - chapter.start_time
 
 
 def _merge_short_chapters(
-    chapters: typing.Sequence[interfaces.YtChapter],
-) -> typing.Sequence[interfaces.YtChapter]:
+    chapters: typing.Sequence[interfaces.MediaChapter],
+) -> typing.Sequence[interfaces.MediaChapter]:
     threshold_seconds = 60
-    merged_chapters: typing.List[interfaces.YtChapter] = []
+    merged_chapters: typing.List[interfaces.MediaChapter] = []
     for idx, chapter in enumerate(chapters):
         if idx == 0:
             merged_chapters.append(chapter)
             continue
 
-        merged_target: interfaces.YtChapter
+        merged_target: interfaces.MediaChapter
         merged_target = merged_chapters[-1]
         if (
             _length(chapter) < threshold_seconds
             and _length(merged_target) < threshold_seconds
         ):
-            merged_chapter = interfaces.YtChapter(
+            merged_chapter = interfaces.MediaChapter(
                 title=merged_target.title + " & " + chapter.title,
                 start_time=merged_target.start_time,
                 end_time=chapter.end_time,
@@ -43,11 +43,11 @@ def _merge_short_chapters(
     return merged_chapters
 
 
-class YtVideoInfoExtractor:
+class MediaInfoExtractor:
     def __init__(self, temp_dir: Path):
         self.temp_dir = temp_dir
 
-    def extract_video_info(self, video_url: str) -> interfaces.YtVideoInfo:
+    def extract_video_info(self, video_url: str) -> interfaces.MediaInfo:
         ydl_opts = {
             "quiet": True,
         }
@@ -59,11 +59,11 @@ class YtVideoInfoExtractor:
         title = response["title"]
         chapter_objects = response.get("chapters") or []
         chapters = _merge_short_chapters(
-            [interfaces.YtChapter(**chapter) for chapter in chapter_objects]
+            [interfaces.MediaChapter(**chapter) for chapter in chapter_objects]
         )
         description = response["description"]
 
-        return interfaces.YtVideoInfo(
+        return interfaces.MediaInfo(
             video_id=video_id,
             title=title,
             chapters=chapters,

@@ -70,10 +70,16 @@ class LLMTopicSegmenter:
                 unique_values = set(v)
                 if len(unique_values) != len(v):
                     raise ValueError("All elements must be unique")
-                if any(i <= 0 or i >= n for i in v):
-                    raise ValueError(
-                        f"All elements must be greater than 0 and less than {n}"
-                    )
+                for i in v:
+                    if i <= 0:
+                        raise ValueError(
+                            f"All elements must be greater than 0 and less than {n}. Paragraph index {i} is less than or equal to 0"
+                        )
+                    if i >= n:
+                        raise ValueError(
+                            f"All elements must be greater than 0 and less than {n}. Paragraph index {i} is greater or equal to {n}"
+                        )
+
                 return v
 
             class Result(BaseModel):
@@ -88,7 +94,7 @@ class LLMTopicSegmenter:
                     {
                         "role": "system",
                         "content": """
-                            You are an smart assistant who reads paragraphs of text from an audio transcript and
+                            You are a smart assistant who reads paragraphs of text from an audio transcript and
                             find the paragraphs that significantly change topic from the previous paragraph.
 
                             Make sure only mark paragraphs that talks about a VERY DIFFERENT topic from the previous one.
