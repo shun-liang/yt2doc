@@ -55,6 +55,8 @@ Get helping information:
 yt2doc --help
 ```
 
+### Transcribe Video from Youtube or Twitter
+
 To transcribe a video (on YouTube or Twitter) into a document:
 
 ```
@@ -67,11 +69,15 @@ To save your transcription:
 yt2doc --video <video-url> -o some_dir/transcription.md
 ```
 
+### Transcribe a YouTube playlist
+
 To transcribe all videos from a YouTube playlist:
 
 ```
 yt2doc --playlist <playlist-url> -o some_dir
 ```
+
+### Chapter unchaptered videos
 
 ([Ollama](https://github.com/ollama/ollama) Required) If the video is not chaptered, you can chapter it and add headings to each chapter:
 
@@ -80,6 +86,16 @@ yt2doc --video <video-url> --segment-unchaptered --llm-model <model-name>
 ```
 
 Among smaller size models, `gemma2:9b`, `llama3.1:8b`, and `qwen 2.5:7b` work reasonably well.
+
+### Transcribe Apple Podcast
+
+To transcribe a podcast episode on Apple Podcast:
+
+```
+yt2doc --audio <apple-podcast-episode-url> --segment-unchaptered --llm-model <model-name>
+```
+
+### Whisper configuration
 
 By default, yt2doc uses [faster-whisper](https://github.com/SYSTRAN/faster-whisper) as transcription backend. You can run yt2doc with different faster-whisper configs (model size, device, compute type etc):
 
@@ -98,6 +114,8 @@ yt2doc --video --whisper-backend whisper_cpp --whisper-cpp-executable <path-to-w
 
 See https://github.com/shun-liang/yt2doc/issues/15 for more info on whisper.cpp integration.
 
+
+### Text segmentation configuration
 
 yt2doc uses [Segment Any Text (SaT)](https://github.com/segment-any-text/wtpsplit) to segment the transcript into sentences and paragraphs. You can change the SaT model:
 ```
