@@ -1,7 +1,7 @@
 import logging
 
 from yt2doc.timer import Timer
-from yt2doc.youtube import interfaces as youtube_interfaces
+from yt2doc.media import interfaces as youtube_interfaces
 from yt2doc.transcription import interfaces as transcription_interfaces
 from yt2doc.extraction import interfaces
 
@@ -36,12 +36,7 @@ class Extractor:
             )
             is not None
         ):
-            return interfaces.ChapteredTranscript(
-                url=video_url,
-                title=video_info.title,
-                chapters=cached_chaptered_transcript,
-                chaptered_at_source=len(video_info.chapters) > 0,
-            )
+            return cached_chaptered_transcript
 
         with Timer() as yt_dlp_timer:
             audio_path = self.yt_dlp_adapter.extract_audio(video_url=video_url)
@@ -49,29 +44,33 @@ class Extractor:
         logger.info(f"Video download and convert time: {yt_dlp_timer.seconds} seconds")
 
         with Timer() as transcribe_timer:
+            transcript = self.transcriber.transcribe(
+                audio_path=audio_path,
+                video_info=video_info,
+            )
             transcripts_by_chapter = [
                 interfaces.TranscriptChapter(
                     title=chapter.title, segments=chapter.segments
                 )
-                for chapter in self.transcriber.transcribe(
-                    audio_path=audio_path,
-                    video_info=video_info,
-                )
+                for chapter in transcript.chapters
             ]
 
         logger.info(f"Transcription time: {transcribe_timer.seconds} seconds")
 
-        self.file_cache.cache_chaptered_transcript(
-            video_id=video_info.video_id,
-            chapters=transcripts_by_chapter,
-        )
-
-        return interfaces.ChapteredTranscript(
+        chaptered_transcript = interfaces.ChapteredTranscript(
             url=video_url,
             title=video_info.title,
             chapters=transcripts_by_chapter,
             chaptered_at_source=len(video_info.chapters) > 0,
+            language=transcript.language,
         )
+
+        self.file_cache.cache_chaptered_transcript(
+            video_id=video_info.video_id,
+            transcript=chaptered_transcript,
+        )
+
+        return chaptered_transcript
 
     def extract_playlist_by_chapter(
         self, playlist_url: str, skip_cache: bool
