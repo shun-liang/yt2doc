@@ -2,9 +2,9 @@
 
 ![Header Image](header-image.png)
 
-yt2doc transcribes videos online into readable Markdown documents.
+yt2doc transcribes videos & audios online into readable Markdown documents.
 
-Supported video sources:
+Supported video/audio sources:
 * YouTube
 * Apple Podcast
 * Twitter
