@@ -29,7 +29,7 @@ class WhisperBackend(str, Enum):
 
 def main(
     video_url: typing.Optional[str] = typer.Option(
-        None, "--video", help="URL of the video to extract"
+        None, "--video", "--audio", help="URL of the video to extract"
     ),
     playlist_url: typing.Optional[str] = typer.Option(
         None, "--playlist", help="URL of the playlist to extract"
