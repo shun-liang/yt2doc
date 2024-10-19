@@ -30,6 +30,8 @@ def get_yt2doc(
     sat_model: str,
     segment_unchaptered: bool,
     llm_model: typing.Optional[str],
+    llm_server: str,
+    llm_api_key: str,
     temp_dir: Path,
 ) -> Yt2Doc:
     DEFAULT_CACHE_PATH.mkdir(exist_ok=True)
@@ -46,8 +48,8 @@ def get_yt2doc(
             )
         llm_client = instructor.from_openai(
             OpenAI(
-                base_url="http://localhost:11434/v1",
-                api_key="ollama",  # required, but unused
+                base_url=llm_server,
+                api_key=llm_api_key,
             ),
             mode=instructor.Mode.JSON,
         )
