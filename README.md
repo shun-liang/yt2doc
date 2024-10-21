@@ -146,5 +146,4 @@ List of available SaT models [here](https://github.com/segment-any-text/wtpsplit
 
 ## TODOs
 * Tests and evaluation
-* Better whisper prompting strategy (right now hugely depend on the title and the description of the video).
 * Better support for non-English languages
