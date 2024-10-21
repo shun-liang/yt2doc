@@ -21,7 +21,7 @@ There have been many existing projects that transcribe YouTube videos with Whisp
 
 ### Prerequisites
 
-[ffmepg](https://www.ffmpeg.org/) is required to run yt2doc. If you are on
+[ffmepg](https://www.ffmpeg.org/) is required to run yt2doc.
 
 If you are running MacOS:
 
@@ -45,6 +45,20 @@ pipx install yt2doc
 Or install with [uv](https://github.com/astral-sh/uv):
 ```
 uv tool install yt2doc
+```
+
+### Upgrade
+
+If you have already installed yt2doc but would like to upgrade to a later version:
+
+```
+pipx upgrade yt2doc
+```
+
+or with `uv`:
+
+```
+uv tool upgrade yt2doc
 ```
 
 ## Usage
@@ -132,5 +146,4 @@ List of available SaT models [here](https://github.com/segment-any-text/wtpsplit
 
 ## TODOs
 * Tests and evaluation
-* Better whisper prompting strategy (right now hugely depend on the title and the description of the video).
 * Better support for non-English languages
