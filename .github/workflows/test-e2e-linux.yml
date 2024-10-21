@@ -12,6 +12,6 @@ jobs:
       - name: Install project
         run: uv tool install .
       - name: Transcribe video
-        run: yt2doc --video https://www.youtube.com/watch?v=S771zr6GDhQ -o output.md
+        run: yt2doc --video https://podcasts.apple.com/gb/podcast/why-should-you-think-like-an-economist/id1523898793?i=1000487091931 -o output.md
       - name: Check if output.md exists
         run: test -e output.md
