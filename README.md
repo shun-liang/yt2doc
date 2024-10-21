@@ -144,6 +144,22 @@ yt2doc --video <video-url> --sat-model <sat-model>
 
 List of available SaT models [here](https://github.com/segment-any-text/wtpsplit?tab=readme-ov-file#available-models).
 
-## TODOs
-* Tests and evaluation
-* Better support for non-English languages
+### Run in Docker
+
+To run yt2doc in Docker, first pull the image from ghcr:
+
+```
+docker pull ghcr.io/shun-liang/yt2doc
+```
+
+Then just run:
+
+```
+docker run ghcr.io/shun-liang/yt2doc --video <video-url>
+```
+
+If you are running Ollama (or any LLM server) locally and you want to segment the unchapter video/audio, you need to use the [host](https://docs.docker.com/engine/network/drivers/host/) network driver. Also, if you want to save the document to the host filesystem, you need [mount](https://docs.docker.com/engine/storage/bind-mounts/) a host directory to the Docker container. For example, if you run Ollam at `http://localhost:11434` on host, and you want yt2doc to write to `<directory-on-host>` on the host filesystem, then
+
+```
+docker run --network="host" --mount type=bind,source=<directory-on-host>,target=/app  ghcr.io/shun-liang/yt2doc --video <video-url> --segment-unchaptered --llm-server http://host.docker.internal:11434/v1 --llm-model <llm-model> -o .
+```
