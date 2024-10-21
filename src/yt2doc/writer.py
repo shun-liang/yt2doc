@@ -28,7 +28,13 @@ class IOWriter:
 
         output_path = Path(output_target)
         if not output_path.exists():
-            raise IOException(f"Path {output_target} does not exist.")
+            if output_path.suffix == ".md":
+                parent_dir = output_path.parent
+                if not parent_dir.exists():
+                    raise IOException(f"Path {parent_dir} does not exist.")
+            else:
+                raise IOException(f"Path {output_target} does not exist.")
+
         if output_path.is_dir():
             file_path = self._get_file_path(
                 output_dir=output_path, title=formatted_transcript.title

@@ -1,0 +1,21 @@
+name: E2E tests Linux
+
+on: push
+
+jobs:
+  e2e-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: FedericoCarboni/setup-ffmpeg@v3
+      - uses: actions/checkout@v3
+      - uses: astral-sh/setup-uv@v3
+      - name: Install project
+        run: uv tool install .
+      - name: Transcribe video
+        run: yt2doc --video https://podcasts.apple.com/gb/podcast/why-should-you-think-like-an-economist/id1523898793?i=1000487091931 -o output.md
+      - name: Display output.md
+        run: cat output.md
+      - name: Check if the output has more than 2000 characters
+        run: test $(wc -c < output.md) -gt 2000
+      - name: Check if the output has more than 10 blank lines
+        run: test $(awk 'BEGIN {paragraphs=0} /^$/ {paragraphs++} END {print paragraphs+1}' output.md) -gt 10
