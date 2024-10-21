@@ -4,6 +4,7 @@ on: push
 
 jobs:
   e2e-linux:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
