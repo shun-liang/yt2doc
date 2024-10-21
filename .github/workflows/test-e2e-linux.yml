@@ -17,5 +17,7 @@ jobs:
         run: cat output.md
       - name: Check if the output has more than 2000 characters
         run: test $(wc -c < output.md) -gt 2000
+      - name: Show number of 10 paragraphs
+        run: grep -z -o "\n\n" output.md | wc -l
       - name: Check if the output has more than 10 paragraphs
         run: test $(grep -z -o "\n\n" output.md | wc -l) -gt 10
