@@ -1,0 +1,16 @@
+name: E2E tests Linux
+
+on: push
+
+jobs:
+  e2e-linux:
+    steps:
+      - uses: setup-ffmpeg
+      - uses: actions/checkout@v3
+      - uses: astral-sh/setup-uv@v3
+      - name: Install project
+        run: uv tools install .
+      - name: Transcribe video
+        run: yt2doc --video https://www.youtube.com/watch?v=S771zr6GDhQ -o output.md
+      - name: Check if output.md exists
+        run: test -e output.md
