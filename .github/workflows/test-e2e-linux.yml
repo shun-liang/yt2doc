@@ -5,7 +5,8 @@ on: push
 jobs:
   e2e-linux:
     strategy:
-      os: [ubuntu-latest, windows-latest]
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: FedericoCarboni/setup-ffmpeg@v3
       - uses: actions/checkout@v3
