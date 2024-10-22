@@ -30,3 +30,7 @@ jobs:
       - name: Check if the output has more than 10 blank lines on Linux
         if: matrix.os == 'ubuntu-latest'
         run: test $(awk 'BEGIN {paragraphs=0} /^$/ {paragraphs++} END {print paragraphs+1}' output.md) -gt 10
+      - name: Check if the output has more than 10 blank lines on Windows
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: ((Get-Content output.md -Raw) -split '\r?\n\r?\n').Count -gt 10
