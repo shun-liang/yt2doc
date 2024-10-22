@@ -20,7 +20,7 @@ jobs:
       - name: Install project
         run: uv tool install .
       - name: Transcribe video
-        run: yt2doc --segment-unchaptered --llm-model gemma2 --video https://podcasts.apple.com/gb/podcast/u-s-presidents-07-andrew-jackson/id899632430?i=1000673807609 -o output.md
+        run: yt2doc --segment-unchaptered --llm-model gemma2 --video https://podcasts.apple.com/gb/podcast/herbert-hoover/id899632430?i=1000470974850 -o output.md
       - name: Display output.md
         run: cat output.md
       - name: Check if the output has more than 2000 characters on Linux
