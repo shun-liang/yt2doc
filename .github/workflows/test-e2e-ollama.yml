@@ -1,0 +1,29 @@
+name: E2E tests with Ollama
+
+on: push
+
+jobs:
+  e2e-ollama-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: FedericoCarboni/setup-ffmpeg@v3
+      - uses: actions/checkout@v3
+      - name: Install ollama
+        run: curl -fsSL https://ollama.com/install.sh | sh
+      - name: Run ollama
+        run: |
+          ollama serve &
+          ollama pull gemma2
+      - uses: astral-sh/setup-uv@v3
+      - name: Install Python 3.12
+        run: uv python install 3.12
+      - name: Install project
+        run: uv tool install .
+      - name: Transcribe video
+        run: yt2doc --segment-unchaptered --llm-model gemma2 --video https://podcasts.apple.com/gb/podcast/herbert-hoover/id899632430?i=1000470974850 -o output.md
+      - name: Display output.md
+        run: cat output.md
+      - name: Check if the output has more than 2000 characters on Linux
+        run: test $(wc -c < output.md) -gt 2000
+      - name: Check number of sub headers is greater than 2
+        run: test $(grep -c "^##\s" output.md) -gt 2

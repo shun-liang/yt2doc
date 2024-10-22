@@ -160,7 +160,7 @@ def main(
             typer.echo("Please provide either --video or --playlist option", err=True)
 
 
-app = typer.Typer()
+app = typer.Typer(pretty_exceptions_enable=False)
 app.command()(main)
 
 if __name__ == "__main__":
