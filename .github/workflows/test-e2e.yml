@@ -3,7 +3,7 @@ name: E2E tests
 on: push
 
 jobs:
-  e2e-linux:
+  e2e:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

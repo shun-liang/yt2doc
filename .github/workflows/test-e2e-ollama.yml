@@ -3,7 +3,7 @@ name: E2E tests with Ollama
 on: push
 
 jobs:
-  e2e-linux:
+  e2e-ollama-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: FedericoCarboni/setup-ffmpeg@v3
