@@ -1,4 +1,4 @@
-name: E2E tests Linux
+name: E2E tests
 
 on: push
 
@@ -23,6 +23,10 @@ jobs:
       - name: Check if the output has more than 2000 characters on Linux
         if: matrix.os == 'ubuntu-latest'
         run: test $(wc -c < output.md) -gt 2000
+      - name: Check if the output has more than 2000 characters on Windows
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: (Get-Item output.md).Length -gt 2000
       - name: Check if the output has more than 10 blank lines on Linux
         if: matrix.os == 'ubuntu-latest'
         run: test $(awk 'BEGIN {paragraphs=0} /^$/ {paragraphs++} END {print paragraphs+1}' output.md) -gt 10
