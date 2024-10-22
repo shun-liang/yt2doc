@@ -1,6 +1,6 @@
 [project]
 name = "yt2doc"
-version = "0.2.5"
+dynamic = ["version"]
 description = "Transcribe any YouTube video into a structural Markdown document"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -18,6 +18,13 @@ dependencies = [
     "wtpsplit>=2.0.8",
     "yt-dlp>=2024.10.07",
 ]
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"  # Use version control (e.g., git) for versioning
 
 [tool.uv]
 dev-dependencies = [
