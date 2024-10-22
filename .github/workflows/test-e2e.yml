@@ -4,11 +4,16 @@ on: push
 
 jobs:
   e2e-linux:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: FedericoCarboni/setup-ffmpeg@v3
       - uses: actions/checkout@v3
       - uses: astral-sh/setup-uv@v3
+      - name: Install Python 3.12
+        run: uv python install 3.12
       - name: Install project
         run: uv tool install .
       - name: Transcribe video
