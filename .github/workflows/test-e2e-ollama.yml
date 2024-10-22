@@ -4,7 +4,7 @@ on: push
 
 jobs:
   e2e-ollama-linux:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest-xlarge
     steps:
       - uses: FedericoCarboni/setup-ffmpeg@v3
       - uses: actions/checkout@v3
