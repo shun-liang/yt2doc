@@ -34,6 +34,12 @@ If you are on Debian/Ubuntu:
 sudo apt install ffmpeg
 ```
 
+If you are on Windows, follow the instruction on the ffmpeg [website](https://ffmpeg.org/download.html#build-windows). If you have installed Scoop on Windows:
+
+```
+scoop install ffmpeg
+```
+
 ### Install yt2doc
 
 Install with [pipx](https://github.com/pypa/pipx):
