@@ -27,12 +27,9 @@ class IOWriter:
             return
 
         output_path = Path(output_target)
-        if not output_path.exists():
-            if output_path.suffix == ".md":
-                parent_dir = output_path.parent
-                if not parent_dir.exists():
-                    raise IOException(f"Path {parent_dir} does not exist.")
-            else:
+        if len(output_path.parts) > 1:
+            parent_dir = output_path.parent
+            if not parent_dir.exists():
                 raise IOException(f"Path {output_target} does not exist.")
 
         if output_path.is_dir():
