@@ -3,7 +3,7 @@ name = "yt2doc"
 dynamic = ["version"]
 description = "Transcribe any YouTube video into a structural Markdown document"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"  # Pending resolution for https://github.com/pytorch/pytorch/issues/130249
 dependencies = [
     "emoji>=2.13.0",
     "faster-whisper>=1.0.3",
