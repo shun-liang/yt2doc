@@ -12,9 +12,9 @@ logger = logging.getLogger(__file__)
 
 
 class LLMTopicSegmenter:
-    def __init__(self, llm_client: instructor.Instructor, model: str) -> None:
+    def __init__(self, llm_client: instructor.Instructor, llm_model: str) -> None:
         self.llm_client = llm_client
-        self.model = model
+        self.model = llm_model
 
     def _get_title_for_chapter(self, paragraphs: typing.List[typing.List[str]]) -> str:
         truncated_paragraphs = [p[:10] for p in paragraphs]

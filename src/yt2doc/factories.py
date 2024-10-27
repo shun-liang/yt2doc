@@ -54,7 +54,9 @@ def get_yt2doc(
             mode=instructor.Mode.JSON,
         )
 
-        llm_topic_segmenter = LLMTopicSegmenter(llm_client=llm_client, model=llm_model)
+        llm_topic_segmenter = LLMTopicSegmenter(
+            llm_client=llm_client, llm_model=llm_model
+        )
         formatter = MarkdownFormatter(sat=sat, topic_segmenter=llm_topic_segmenter)
     else:
         formatter = MarkdownFormatter(sat=sat)
