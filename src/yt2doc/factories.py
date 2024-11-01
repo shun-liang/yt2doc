@@ -29,6 +29,7 @@ def get_yt2doc(
     meta: extraction_interfaces.MetaDict,
     sat_model: str,
     segment_unchaptered: bool,
+    ignore_source_chapters: bool,
     llm_model: typing.Optional[str],
     llm_server: str,
     llm_api_key: str,
@@ -70,6 +71,7 @@ def get_yt2doc(
         video_info_extractor=video_info_extractor,
         transcriber=transcriber,
         file_cache=file_cache,
+        ignore_source_chapters=ignore_source_chapters,
     )
 
     yt2doc = Yt2Doc(extractor=extractor, formatter=formatter)

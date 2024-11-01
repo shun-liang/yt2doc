@@ -150,6 +150,15 @@ yt2doc --video <video-url> --sat-model <sat-model>
 
 List of available SaT models [here](https://github.com/segment-any-text/wtpsplit?tab=readme-ov-file#available-models).
 
+
+### Ignore chapters from source
+
+Sometimes, the chaptering of the video/audio at the source does not segment the content in the way you are happy about. You can ask yt2doc to ignore the source chaptering by
+
+```
+yt2doc --video <video-url> --ignore-chapters --segment-unchaptered --llm-model <model-name>
+```
+
 ### Run in Docker
 
 To run yt2doc in Docker, first pull the image from ghcr:

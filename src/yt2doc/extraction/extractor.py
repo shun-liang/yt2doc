@@ -14,10 +14,12 @@ class Extractor:
         video_info_extractor: youtube_interfaces.IYtVideoInfoExtractor,
         transcriber: transcription_interfaces.ITranscriber,
         file_cache: interfaces.IFileCache,
+        ignore_source_chapters: bool,
     ) -> None:
         self.yt_dlp_adapter = video_info_extractor
         self.transcriber = transcriber
         self.file_cache = file_cache
+        self.ignore_source_chapters = ignore_source_chapters
 
     def extract_by_chapter(
         self,
@@ -27,6 +29,10 @@ class Extractor:
         logger.info(f"Extracting video {video_url} by chapter.")
 
         video_info = self.yt_dlp_adapter.extract_video_info(video_url=video_url)
+
+        if self.ignore_source_chapters:
+            video_info.chapters = []
+
         if (
             not skip_cache
             and (
