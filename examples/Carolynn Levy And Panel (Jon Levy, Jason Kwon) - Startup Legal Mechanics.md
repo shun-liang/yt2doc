@@ -1,16 +1,8 @@
-```
-uv tool list
-# yt2doc v0.2.9.dev1+gdfc8ac3.d20241101
-# - yt2doc
-
-yt2doc --video https://www.youtube.com/watch\?v\=BTShgZxiNV8 --whisper-backend whisper_cpp --whisper-cpp-executable $HOME/Development/whisper.cpp/main --whisper-cpp-model $HOME/Development/whisper.cpp/models/ggml-large-v3-turbo.bin --sat-model sat-9l -o examples --segment-unchaptered --llm-model gemma2 --skip-cache --ignore-chapters
-```
-
 # Carolynn Levy And Panel (Jon Levy, Jason Kwon) - Startup Legal Mechanics
 
 https://www.youtube.com/watch?v=BTShgZxiNV8
 
-## Startup Incorporation Advice
+## Startup Mechanics: Key Legal Considerations
 
  I would like to introduce my colleague Carolyn Levy to my right here, who's going to talk about startup mechanics. And then with Jon Levy and Jason Kwon, they'll answer some questions about getting your startup started, legal issues. I will point out that these three folks are probably the finest legal minds in the startup world. And I do not exaggerate. They may hate me saying it, but these folks have seen more. They've worked with more startups in more situations than you could believe. And some of the situations you wouldn't believe. So they know everything. And so I do hope you listen carefully. And I do hope. 
 
@@ -22,8 +14,6 @@ Okay. So the first thing you have to do when you're starting a startup is actual
 
 Okay. So this has been mentioned a couple times already. We also strongly recommend that you use an online platform specifically geared to startups to incorporate. And there's a lot of companies. And there's a lot of companies. And there's a lot of these platforms. Some are good. Some are good. Some are not so good. Clerky and Stripe Atlas have already been mentioned. And those are the two that we think are great. They're YC companies. We have extensive experience with Clerky. And I was really happy to hear that Darby Wong, one of the founders of Clerky, is going to do an AMA because he's great. And one of the reasons why we think Clerky and Stripe Atlas are so great is because they don't stop after formation. They also have post-incorporation documents. And some of the not-so-good platforms stop after formation and they don't do post-incorporation. And one of the things that doesn't happen if you don't do post-incorporation is founders don't buy their stock. And when we were commuting down here today, Jason reminded me of a story, a really big company and a really big law firm. And they didn't, the founders never bought their stock. And this wasn't discovered until the Series B financing. So if you think this sounds weird, like, of course founders need to buy stock. This is a mistake that actually happens. 
 
-## Early Startup Incorporation Steps
-
 Okay. Another step in the incorporation process is forming a board of directors. And for early startups, the members of the board are usually the founders. If you're a solo founder, you can have a board of one. If you are two founders, you can have a board of two. There's a misconception that board of directors have to have an odd number of directors, but that is not necessary. And then you need to appoint corporate officers. You need to have a president and or a CEO. You can have both if you want. And in Delaware, you're required to have a corporate secretary. And another part of the process is adopting corporate bylaws. For startups, bylaws can be extremely generic. And finally, this isn't technically part of the incorporation process, but I encourage you to open a corporate bank account as soon as possible. Most startups won't have very much cash to put in that bank account, but it's great to get into the habit of treating the corporation as a separate entity as early as possible. And it's critical to form good habits around the way you treat your company's money. 
 
 Okay. So post-incorporation. So now we're going to go back to what I just said about issuing founder stock. You all know that corporations are owned by stockholders, and you and your co-founders are going to be the first stockholders. Okay. If you are a founder team of two or more, you have to think about how you're going to allocate that stock. Our belief about the best way to allocate stock among founders is to think about the challenge of execution, and that's another way of saying the following. Do not place too much importance on the founder that had the idea for the business, because all of the hard work is in front of the team, and all of the value is going to be created in the future. If you are all going to be working hard going forward, which you all are, we think the equity split should be more or less equal among you. If you and your co-founders are having a really hard time coming to a consensus about stock allocation, there may be underlying trust or commitment issues with the team, so you want to pay close attention to that. 
@@ -34,13 +24,13 @@ Okay, because founders tend to identify so closely with their startup, it's easy
 
 Okay. So employment, whether of founders or others, does not require an employment agreement. Employment agreements are not actually appropriate for startups because employment is at will by default. And the basics of hiring and firing are governed by law anyway. In fact, employment agreements can sometimes complicate things because courts may interpret certain of the language in an employment agreement as changing that default at will status to a for cause status, which makes it a lot harder to terminate people. So an employee agreement is only necessary if you're hiring an employee who's going to have something special, like a severance package. And we really don't see those in startups. But what is really, really important is that all the founders and in the future, you know, everyone who works for your company has signed a CIIA or a PIIA. And I'm sure a lot of these, it's a confidential or proprietary information invention assignment agreement agreement. The CIIA protects the company's confidential information and trade secrets and ensures that all the intellectual property that is created is owned by the company. So you want everyone in the company signed up to one of these. Very early stage startups usually cannot afford to have employees, but the solution is not to convince people to work for your company for free. It's one thing for founders to work for free, but it's significantly riskier for non-founders creating work product and other intellectual property to work for no compensation. So unfortunately, all of you all have to do all the work until you can afford to hire. 
 
-## Using Company Funds: Common Sense
+## Common Business Mistakes To Avoid
 
 So I'm going to wrap up this summary and digress from legal mechanics to make a few common sense points. And my belief, my personal belief, is that ignoring these points can cause you to waste a lot of time fixing problems later. These are really common mistakes. 
 
 So ideally, you will have opened a corporate bank account as part of or right after incorporating the company. And hopefully, you have a little bit of money in it. So you should use that for all of your company expenses. If the company bank account has no money in it and you are paying for all the business expenses with your own personal savings, the company can reimburse you later when it eventually has money. But you absolutely need to keep all the receipts and you need to document everything carefully. 
 
-## Startup Incorporation Essentials
+## Startup Legal & Tax Essentials
 
 Corporations have to pay taxes. If your startup is a Delaware corporation, there is an annual tax you have to pay to that state. But if you calculate it correctly, the tax owed is really minor for startups. Corporations also have to file a corporate tax return with the IRS. Obviously, when your company is just getting started, you're not going to actually owe the IRS any taxes, but you still have to file the return. And if your startup does have employees, even if it's just the founders getting minimum wage, you need to pay payroll taxes. And the best way to do this is to get set up with an online payroll service, of which there are many. 
 
@@ -48,15 +38,19 @@ Oh, this is a personal favorite of mine. So you need to find a good place to sto
 
 Later, when your company is fundraising and investors are doing due diligence on your company, it just looks really amateur when you serve up a bunch of formation documents and there's a bunch of blanks in them. 
 
-## Starting & Running a Startup
+## Treating Startups Like Real Companies
 
 All right. So that's the summary of that. Oh, sorry. One more thing. I just wanted to mention what is acting like a real company. And my opinion is that acting, if you treat your startup like a board of directors, governed taxpaying, founder, employee, confidential information holding entity, that that's the way to act like a real company. And this is also the only way you're going to get protection from personal liability, which is the whole point of forming a separate legal entity anyway. 
 
 Okay. Now we're going to move on to common mistakes and problems. 
 
+## When to Form a Corporation for Startups
+
 Okay. I don't know when to form a corporation. So this isn't actually a problem or a mistake. I just wanted to talk about it here. And it turns out that a lot of you emailed us this question. So the right timing on when to pull the trigger on incorporating is going to actually be different for every startup. But in general, we believe in doing it sooner rather than later. And so my top four reasons about why you want to do this would be, number one, because forming a corporation protects you and your co-founders from personal liability for your company's actions. Number two, the corporation is the correct repository for all of the intellectual property that you and your co-founders are creating. Otherwise, you're all just working on a project, the separate pieces of which are owned by individuals. And to me, that's a hackathon, not a corporation. 
 
 Number three, you can't raise, you all know this, you can't raise real money for your startup without forming a corporation first, because your mom might give you some money for your startup, but no professional investor is going to wire money to your personal bank account. And you need to have a corporation in order to have payroll. And you can't enter into contracts with vendors or consultants or potential customers personally. And if you try to do these things as an individual, it's super messy. I formed an LLC instead of a corporation because I got advice that LLCs are better for taxes. So for our purposes, this is usually a mistake, because even though LLCs are better for optimizing taxes, the vast majority of angels and VC firms will not invest in an LLC. So if you plan to fundraise from people, other than a small group of your friends and family, your startup needs to be a corporation. 
+
+## Why Choosing A Corporation Over An LLC From The Start
 
 The question that several of you asked in the emails is whether there are other reasons besides fundraising considerations to form a corporation instead of an LLC. And so in other words, if you're not planning to fundraise for a long time after starting your company, does it make sense to start out as an LLC and then switch to a corporation later? And in my opinion, the answer is no, because I don't believe the tax benefits of an LLC are compelling enough to outweigh the inconvenience of converting your LLC into a corporation later. 
 
@@ -64,27 +58,25 @@ And for those of you who watched the 2014 Startup School lecture, Kirstie and I 
 
 Okay, I'm thinking about hiring a lawyer to incorporate my company. So this is usually not a mistake if your startup is really complicated for some reason, or if you've already formed a non-U.S. entity and you now want to come to the United States and raise money. In these cases, you probably do need to get a lawyer, but I'm sure all of you know lawyers are very expensive. So save money and use one of the good online platforms that we just talked about for incorporation. Also realize that lawyers who are free, like family members doing you a favor, may not be actually as good as the online platforms because they don't specialize in corporate transactional work. So your Aunt Sally who does personal injury may mean well, but Clerky and Stripe Atlas will do a much better job. 
 
-## Starting a Startup While Employed
-
 I'm starting a startup, but I still have a full-time job. This has actually already come up today. Common problem for founders because it's a big decision to ditch the security of a salary. I think some of the other speakers in this course will talk about sort of the psychology of taking that plunge. But if you've decided to work on your startup in your spare time, the primary legal consideration is just keeping everything separate. So in California, for example, if you're working on your startup on your own time with your own resources, your current employer should have no claim on your new business idea. So use a different computer. Don't work on it during business hours. But keep in mind that different states and even different countries have very different rules about this particular issue. And there's things like non-compete agreements with your employer that may come into play. So if you're going to do this, you really should do a little bit of research first or get legal help. Our founding team has been working on this idea for years, so we don't need vesting on our founder shares. This is a broken record. We hear this all the time. This is a big mistake. If you don't have vesting, you are setting your company up for future problems. No investor wants to put money into a company with founders who may decide the next day that they're burned out so they take their shares and they leave. But the more common scenario is that one member of a founding team decides that he or she is burned out and so leaves the company with a giant ownership stake. The remaining founders have to do all the work, but someone who's not doing any work has the same ownership. It is painful to fix this problem because the price of the company's stock may have increased in the interim and it becomes really expensive for the remaining founders to allocate the share ownership fairly. 
 
 How many of you are single founders? I'm just curious. Quite a few of you. Okay. Okay. So I'm a single founder and I don't need vesting, you may be thinking. I think this is also a mistake. Single founders obviously don't have the same problems that founder teams do, but no vesting is still unattractive to investors for the same reasons. Also, you will eventually hire employees and probably grant them stock options and those stock options will have vesting and it just is a lot better when you lead by example. 
 
-## Don't Skip Your Founder Stock Purchase Agreement
+## Don't Sign Legal Docs Blind: Founder Stock Matters
 
 All right. Another personal favorite. I signed a legal document, but I was too busy to read it, so I have no idea what it is. This happens a lot. This is a big mistake. We see founders do this all the time and I mean we sympathize, right? 
 
 The legal mechanics of your startup are the really boring parts of the process. You can get away with not reading every word of your bylaws, for example, but you need to understand every provision in your founder stock purchase agreement. You actually don't want to have anything happen with your company stock that you don't know every word of. And this is actually a bigger problem. 
 
-## Read Your Company Documents
+## Read Company Docs: Vital for Founders
 
 This isn't such a huge problem with formation documents. It's a big problem with fundraising documents. I can't tell you how many founders have told me they won't read a five-page safe. So you want to get into the habit now of reading all of your company documents. It's daunting. It's legalese, whatever. Read it anyway. Understand it. It's a great habit to get into. And then you'll know if it isn't signed. 
 
-## Paying friends with stock: risks and legal aspects
+## Paying Friends with Stock: A Risky Move
 
 Okay. My friend offered to work for my startup for free, so I'm going to pay her with shares. Generally, this is a mistake because people who work for your company need to be paid money. Obviously, compensation packages can include an equity component, but paying with only stock is not a good idea. The exception is if your friend can be hired by your company as a consultant or independent contractor. Those are the same thing. And it's okay for consultants to be paid for services with just stock, but you have to first get comfortable that your friend is properly classified as an independent contractor. And the rules in California about this just changed and got stricter. Also, you'll want to make sure you paper this relationship with a good consulting agreement because you really want to make sure that the company owns all of the consultant's work product. You don't want to wing it. 
 
-## Startup Legal Advice: Names and Breakups
+## Early Startup Legal Pitfalls: Naming, Breakups & Trademarks
 
 Okay. This is a big one. My co-founder and I don't want to work together anymore. So, this is sometimes a small problem, and this is sometimes a fatal problem. Startups die sometimes because of this. And it happens, unfortunately, a lot. And it can be overwhelmingly acrimonious. It's kind of like watching people get a divorce. So, the reason to pay careful attention to the points I've already mentioned, like paying yourselves, having vesting on your founder's shares, having a CIIA that clearly demonstrates that the company owns all the IP that's created. Doing these things can significantly decrease the legal drama around breakups. I don't know what decreases the emotional drama, but that decreases the legal drama. My company has some employees, and I promise to issue them stock. This isn't a problem, as long as you take action on it sooner rather than later. And the appropriate action to take is to adopt a stock incentive plan and to grant stock to these early employees. A stock plan, as some of you probably know, is like a 15 to 20-page document. It references a specific number of shares of your company's common stock that are allocated to the plan. The company can issue restricted stock or stock options pursuant to the plan. But what you need to know about stock options is that if you grant stock options, you have to get something called a 409A valuation. And most startups don't want to do this until after they've had a fundraising event. So you can issue restricted stock to employees under this plan, and they will also have vesting. And they come with a whole host of tax and securities rules, which is why the plan needs to be 20-plus pages long. But the reason to not wait too long to do this is because the longer you wait, the more expensive your stock will get. And so you want to give your employees cheap stock, or as cheap as you can, because expensive stock is not very incentivizing. 
 
@@ -92,11 +84,9 @@ I got a cease and desist letter. Another company says my company is infringing o
 
 Related to this, a few of you emailed the question about whether or not it's worth it to register your company's name and get the official trademark. Generally, we consider trademark registration to be something that can wait. It's a nice-to-have and not a need-to-have in the early days of your startup. All right. Finally, I picked an awesome name for my company, but I have to pay 10K to get the domain. This happens a lot. So, again, don't fall in love with a name that may cause you to make bad decisions, no matter how great that name is. It is a bad decision to waste time getting into a lawsuit with a company that claims you stole its trademark. And it is usually also a bad decision to spend a ton of money on a domain. So do your research on names. Don't just research the PTO. Research it. And then do whatever is cheapest and most efficient and move on. 
 
-## Expert Q&A Session Begins
+## 83B Election: Startup Founders Guide
 
 Okay. That's it. So now we're going to have John and Jason come up. And we – okay. So what we did is we took – you guys emailed us a bunch of questions. And we pulled some out. We edited them a little bit for brevity, but we mostly kept them sort of unfiltered, original style. So we're going to go through a bunch of those now. 
-
-## 83B Election: Key Filing Details
 
 Okay. Jason, I'm going to ask you the first question when you're ready. Go ahead. Okay. When does the 30-day IRS clock for filing an 83B election start? And you might want to just start by describing what an 83B election form is in case somebody here doesn't know. 
 
@@ -112,7 +102,7 @@ Well, yeah. I mean, Jason was just saying like there are some fixes sometimes, b
 
 Yeah. If you remember nothing else from this, file your 83B election forms. 
 
-## Seeking TN Visa for Startup - Seek Expert Advice
+## Immigration Laws: Seek Expert Advice
 
 Okay. So we also got a lot of questions that touched on a variety of immigration issues. So, and here's a sample question we got. I'm in Canada. Can you help me get a TN visa so I can work on my startup in the U.S.? 
 
@@ -122,25 +112,25 @@ This is a difficult, you know, Jeff said we know everything, but immigration is 
 
 Now, immigration is particularly tricky. You know, it's a political issue, obviously, now. So it's the landscape's always changing. But it's also, it's more of an art than a science. So it's always been very difficult for us jumping in, knowing the basics, to talk about immigration. We're really not experts in this area, and you definitely need to speak to an expert. 
 
-## C-Corps vs. S-Corps: Taxation and Investment
+## C-Corps vs S-Corps: Taxation and Invesment
 
 Yeah, okay. Jason, should I be a C-Corp or an S-Corp? 
 
 C-Corp. So if you just file in Delaware, you're kind of a C-Corp by default. In order to actually be an S-Corp, you have to make an election on a tax form. And the difference between the two, of the C-Corp or S-Corp, is S-Corp is pass-through taxation, so it's tax transparent. So any income earned by the corporation is then passed through to its owners. The C-Corp cuts off the income at the level of the corporation. And the corporation pays taxes. And so the reason why you want to be a C-Corp is that's the kind of entity that investors are used to investing in. And also, when you actually take investment from outside investors, it will blow the S-Corp election most of the time anyway. 
 
-## Equity for Employees During Incorporation
+## Equity for early employees: 10-20%
 
 Okay. John, how much equity should we save for our first employees or key hires during the incorporation of the company? 
 
 That depends on the size of the company and how many people you need to hire. I would say, you know, the standards of probably 10% to 20% people think is going to be, you know, saved for employees. But it's definitely specific to the company. So I would, you know, this is a situation where it's very easy for me to say, hey, you should be very generous with your employees and, you know, have alignment and make sure they're benefiting from the upside in the company. It is something I believe very strongly. And especially if you have good employees, you want to keep them. You want them aligned with your mission. So it's worth, you know, thinking about this in a long-term view, having a long-term view and, you know, setting up everyone for success. The online platforms, Clerky and Stripe Alice, well, I know Clerky for sure, has, you can actually create a stop option pool at Formation if you want to. So if you've already thought that far ahead and you know you want to have a plan set up, you can do that at Formation. I would say, though, the vast majority of companies actually wait and don't adopt a stock option plan until they're a little farther along. 
 
-## Unpaid Interns: Generally Illegal
+## Unpaid Interns: Legality & Exceptions
 
 Jason, is it illegal to have unpaid interns? 
 
 Generally, yes. So you just went over this in the fundamentals. So you want to avoid unpaid employees. Interns are going to be generally considered employees. And then there are some exceptions you can use or take advantage of for giving people, you know, sort of college credit if they're college interns or things like that. But, you know, that's going to take some work on your part to actually learn those rules and you're probably going to need to talk to a lawyer for those things. And if you want to get people, the help of people and, you know, just pay them in the form of equity, again, you know, that was already covered by Carolyn's presentation. They could be contractors, but there are standards for when somebody is classified as a contractor versus an employee. And those standards got just recently more are harder to satisfy given some of the California Supreme Court rulings. We had a YC company once that had 14 interns, 14 unpaid interns. That was a big mess. 
 
-## Legal Practices for Starting Nonprofits
+## Starting a Nonprofit: Legal Practices and Partner Selection
 
 Okay. John, there's a ton of advice out there for how to properly structure for a nonprofit for a for-profit startup. What about nonprofits? What's the best legal practices for starting a nonprofit startup? 
 
@@ -152,13 +142,11 @@ So that question probably answered itself. Generally, you want to work with peop
 
 And this goes back to what I was saying about founder breakups. I mean, that's a recipe for disaster to work with someone you've only just met. Because we've seen brothers break up. Like the founder breakup goes through all levels of relationships. So you're going to stack the deck against yourself if you have a stranger involved. 
 
-## Registering Parent Company: Market & Business Focus
+## Startup Formation & Legal Considerations
 
 John, what are key factors to consider while determining what country should one register their parent company in? 
 
 The quick answer is where's your market? Where's your business? Who are you? You know, most people set up in the U.S. because they're attacking the U.S. market, which is a big market. If you're selling something in India, you should be in India, most likely. The problem with this question, like the parent subsidiary question to me, I always think like when I'm talking to startups, keep it simple. Like get, you know, this lecture seems a little dry and it's a little, you know, it's the legal mechanics, not the most exciting thing. But it's really pretty simple if you think about it. It's like, hey, you know, form your corporation. Be serious. Keep your documents. Like don't have one person squirrel it away. Buy your stock from the company. Never forget your 83B. That's the one thing I want to drill home. You know, after you buy your stock, you file your 83B. That's about it. Like there's not that much to do as long as you're serious. With parents, subsidiaries, complexity. When I hear that from companies early on, I just want to run. You're going to make it extra hard on yourself with that kind of stuff. 
-
-## Legal Advice for Startups: When to Use Tech vs Lawyers
 
 Jason, with the explosion of legal services tech, it's possible I may not need traditional counsel until a sophisticated angel or institutional round. When do you advise your companies to stop using these services and migrate to a traditional law firm? How would you distribute the work between the two? 
 
@@ -166,35 +154,37 @@ Yeah, so there are a lot of good tools out there right now. So you could use Cle
 
 So, John, this question is kind of similar to the one I just asked you. So it's probably the same answer, but you can reiterate. From a legal perspective, can I form a startup and then sell it while having a full-time job? If so, what things should I consider? 
 
-## Starting and Growing Companies: A Full-Time Endeavor
+## Starting a company is too demanding to be part-time.
 
 I also think Jeff, touching this earlier, but this is kind of asking the impossible. There's no way or I've never seen any company started part-time on weekends, holidays, you know, become like a giant company. Maybe, you know, you can do that on a small scale, but this is a, you know, we're asking you to start a company out of thin air, and that is very difficult to grow a giant company. This is an all-consuming, you know, full-time thing. It's not like, oh, I'm going to do this as a hobby. So I don't want to sound dismissive, but I just think that's practically impossible. I wouldn't even think that way. Like, this isn't a part-time gig. 
 
 Jason, are patents ever worth applying for? 
 
-## Patents: Useful for Protection, Execution Matters More
+## Patents: Importance for Startups
 
 So this is a, this is sort of like a, this could, you could talk a very long time about patents and whether it's useful to, or worthwhile applying for them. The short answer is, so patents are useful for protecting your technology, especially from competitions and copying your technology. Your technology matters. If you're pursuing a software startup, you know, or tech-enabled internet company, patents tend to matter less. There's less protection under patent law for software or patents anyway, and most of your success is going to be determined not by the protectability of your property under law, but rather your execution under the software. If you're pursuing a life sciences startup, their duplication is actually easier for competitors to, you know, execute on. So patents tend to be more important. And, you know, if you have questions about, you know, the specific things that you're doing technology-wise and whether it falls into the weak patent or strong patent protection bucket, you should definitely consult with a patent expert or lawyer on that. But the last part of this is that no company has, you know, sort of, you know, raised money purely on the, on the strength of their patent portfolio. It's always going to come down to, you know, you know, or how good is the founding team, you know, can they execute on their vision? You know, the patents are just one part of the puzzle. 
 
-## Founders & Co-founder Dynamics
+## Advisors & Equity: More Than Free Stock
 
 John, I'm thinking about setting up an advisory board and wonder if advisors should have equity. In my experience, advisory boards are more a non-US thing, like non-Silicon Valley thing. Maybe in Silicon Valley, we see advisory boards for, for life sciences companies. You would see, you know, academics and professors try to legitimize the company as advisors and get a little stock. But this is not something where, you know, it's not something where you give stock to people warily, with them, without thought. It's more, I think the best quote on advisors, somebody said, was like, advisors are investors who want stock for free. And that's kind of how I think about it. Like, you know, people should invest, ideally, instead of advising for free shares. And I know this is in like a one size, but some situations, like I was saying, it's appropriate, maybe a life sciences company. And you can have consultants who get stock, but it's mostly a situation I try to avoid. 
 
+## Firing a Co-Founder: Act Fast for Company & Friendship
+
 Jason, what have you seen founders do when they had to cut off and fire a co-founder who is a personal friend? Has anybody here ever had a roommate who's been a friend? It's kind of like that, right? So sometimes, you know, it's better to not do certain things with your friend so that you can stay friends. And so if you have started a company with a friend of yours and it's not working out, and it's oftentimes because you guys have different ideas about the direction the company should go in, or somebody's working just a lot harder than the other person is, it's usually better to just solve that problem or, you know, basically, you know, resolve that problem as soon as possible, rather than letting it be something that you think or hope will work out over time and letting it fester. Because not only does it hurt the company, it hurts the friendship, too. So it's generally better to kind of get to a quick resolution. Yeah, you don't want to stall on that. That's something I would add. Like, the biggest mistake we see is people delaying and thinking, oh, things are going to work out, and this is a friend, and things are going to change. It's usually best that you just end the relationship if it's not working. End the startup relationship. Yeah, the startup relationship. Hopefully preserve the friendship. Preserve the friendship. 
 
-## Reviewing Potential Loopholes in Privacy Policies
+## Reviewing Privacy Policy Loopholes: Services vs. Lawyers
 
 Exactly. Okay, John, what is the best methodology for reviewing potential loopholes in your privacy policies in terms of service? 
 
 This is an area where if you're going to spend money early on on a lawyer and you have something that's tricky, that's a sensitive startup topic, it's worth spending money on a lawyer. But there are excellent services for privacy policies in terms of service on the internet right now. IU Bend is one, and all the major law firms also have privacy policy generators. But if there's something specific, or IU Bend, I'll send out on the resources tab. It's definitely important. It's required if you're taking somebody's information. You have to have a privacy policy up on your website or your app in California. So this is something you need to do. There are good services. In certain circumstances, you're going to need to hire a lawyer in this situation. So as many of you probably know, if you are collecting personally identifiable information from anyone in the EU, you're governed by the GDPR. And that's a huge quagmire. And so if you fall into that bucket, even though some of these privacy policy generators are fantastic, they're not going to get, they're probably, I mean, unless someone's really done a great one, they're probably not going to cover all the stuff you need to know for GDPR. So you would probably want to get a lawyer for that. Let's see. 
 
-## 18 hour workdays: Not Sustainable for Startup Founders
+## 18-hour workday advice for startups
 
 Jason, should we work 18 hours a day as a co-founder and founder of our startup? How can we measure and manage our commitment status for our product? 
 
 So the advice we give all of our startups is to still exercise, sleep, and, you know, have some semblance of a life in terms of, like, maintaining some of your relationships and friendships. So 18 hours a day is not something that we would recommend, really, except for maybe, like, short sprints where you need to get something out. And, you know, just remember that this is just going to be a multi-year journey when you're building a company. So to use a tire cliche, it's a marathon, not a sprint. You don't want to get sick. 
 
-## Shareholder Agreements for Startups: A Discussion
+## Shareholder Agreements for Startups -  A Discussion
 
 Okay. John, should we have a shareholder agreement and what should be included in a good shareholder agreement? 
 
@@ -210,11 +200,9 @@ So the technical answer is, yeah, there are methods you can use to actually conc
 
 So Jeff and Adora, I don't know how we're doing on time and whether or not you want to do any other Q&A. So are there any questions? Shockingly, there are. Why don't we take just a few questions and then we'll call it on PitchBook. 
 
-## B Corps: Not Nonprofit Expert
+## B Corporations: Mission & Investment Considerations
 
 Okay. All right. Yes. Can you talk about B Corps? That goes back. I'm not an expert on nonprofits. I don't think. 
-
-## B Corps: Challenges and Considerations
 
 Oh, thank you. She's asking about B Corps, which is a quasi nonprofit and for profit corporate social enterprise where you're part of your mission is to help is for the public good. That's not something I'm an expert in, unfortunately. Many companies have been doing it recently. It's much more prevalent. I just I'm not really qualified to speak of it. It changes the fiduciary duties, right? So the whole goal of the I mean, the goal of your average corporation is you make money for the stockholders, right? B Corp is more like there's a social good. So the fiduciary duties on the part of the management and the directors are different. And like John said, they're gaining in popularity. So I think we're going to see a lot more of them. 
 
@@ -226,7 +214,7 @@ One point about a B Corporation is you can imagine it might not be as attractive
 
 Yeah, it could be done. I just don't know the wisdom of it. 
 
-## SaaS Incorporation: US vs. Australia
+## SaaS Company Incorporation: US vs. Australia
 
 Way back there. I have a question. I have a SaaS company and I'm just wondering should I register a company in the US as well if I don't have to target the US market? I do charge the US dollars, but I'm not working on the US. Would it be beneficial for the rest or not for the US? 
 
@@ -236,17 +224,17 @@ Yes, it is similar. The question is I believe you have a SaaS company in Austral
 
 It sounds like you're thinking about the US. You're not 100% sure. And I would just figure out really where you want to be from a practical standpoint. 
 
-## US Incorporation Advantages for Businesses
+## US Incorporation Advantages
 
 Again, setting up complex structures is really what the question that we were talking about earlier. And if I have like a little aversion to that, you know, it could be a good situation where it makes sense to have a parent subsidiary structure for you. But it's a little more complicated. You can incorporate in the US and then have your Australian company be a sub. But again, you could just incorporate in the US and just sell into Australia. Like you could just not, I mean, if that's your market and that's where you want to raise money, just incorporate and be a US company. We always suggest US companies. It's much easier to fundraise in the US and much more favorable terms, in my opinion. So I always tend to push people to be in the US. It's just better for the business long term. Just running short of time, just two more questions. 
 
 Two more questions. 
 
-## Prompt Completion: Extracted Objects as JSON
+## Interpret Text as JSON
 
 Okay, how about you back there? 
 
-## Adding Co-Founders & Investor Impact on Vesting Schedules
+## Vesting Schedules: Co-founders & Investors
 
 I have a question about the business schedule that you talked about earlier. If you add co-founders into the year after you started the company, do you have to restart the business schedule for all the shareholders or all the founders? Or in the same question, every single time you raise money, do you have to restart the company? 
 
@@ -258,7 +246,7 @@ Anyway, but to answer your question, no, you guys will stay on the same vesting 
 
 Now, the thing that some of you probably already know is that when your investors come in, they may decide they want to restart you all. I mean, unless you had absolutely zero leverage, they're not going to start you back on square one. But sometimes investors look at your schedule and they say, ah, you guys only have about a year left. That's not really enough for us. Can we put on another year? So that happens every now and then. And again, it depends a lot on leverage. But don't be surprised if that happens. Did that answer your question? Okay. Okay, I think we want more. One more. Someone else. Someone else. 
 
-## Hiring Foreign Employees: Country Specific Rules
+## Hiring Employees Outside the US
 
 So you talked about having very simple structure. We have employers outside the U.S. And how do we pay those employees? How do we have them in the U.S. entity if we don't want to register an entity in the foreign country? So the question was, how do you hire outside the U.S. when you have a U.S. entity? And how do we show them? Is it a contractor? Are they employed? We want to give them straws. We want to have them outside. But they're not a U.S. employee. They're not U.S. company. 
 
@@ -266,6 +254,6 @@ Yeah, so the short but unsatisfying answer is going to be that it depends on whi
 
 Thank you guys very much. So, sorry to have to cut off. I know there's a lot more questions live here. Remember, Darby Wong is, from Clerky, is having an AMA now, tomorrow, but it's open now. You can post questions. So, if you have questions, that is an outlet and you can always work with your group to ask more questions. 
 
-## Starting a Company: Full-Time Commitment
+## Starting a company is full-commitment.
 
 Just one more word on the part-time question, which has come up a few times and we discussed a little bit at the break. The way I look at that, it is certainly true that some companies are kicked off while people are working in a full-time job. But those aren't really companies yet. They're just projects. They're just ideas. Once you really start your company and all of the great companies have this feature, you'll be on it full-time. You'll be on it more than full-time. You'll be on it 120%. So, thank you all for coming in person and thank you for watching online. Just a couple reminders. There will be a conversation with the founder of Y Combinator, Paul Graham, on Friday, as well as the AMA Tomorrow with Darby. Next week, we're going to dive into product with the CEO of YC, Michael Seibel, and David Rusenko from Weebly on building product and product market fit. There are also several great videos in the startup library on product that I very much encourage you guys to take a look at. And lastly, log in to the site many of you already have, post on the forum, post in your group, and figure out how it works. Hopefully, it'll be a good home for all of you. And if you have any issues, send an email to ycombinator at startupschool.org. And everyone have a great day. Thanks. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you.
