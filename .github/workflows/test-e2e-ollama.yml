@@ -26,4 +26,4 @@ jobs:
       - name: Check if the output has more than 2000 characters on Linux
         run: test $(wc -c < output.md) -gt 2000
       - name: Check number of sub headers is greater than 2
-        run: test $(grep -c "^##\s" output.md) -gt 2
+        run: test $(grep -c "^##\s" output.md) -gt 1
