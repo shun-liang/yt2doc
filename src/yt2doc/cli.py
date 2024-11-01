@@ -84,6 +84,12 @@ def main(
             "--segment-unchaptered", help="Segment unchaptered video by topic"
         ),
     ] = False,
+    ignore_source_chapters: typing.Annotated[
+        bool,
+        typer.Option(
+            "--ignore-source-chapters", "--ignore-chapters", help="Ignore original chapters from the source"
+        ),
+    ] = False,
 ) -> None:
     io_writer = IOWriter()
 
@@ -136,6 +142,7 @@ def main(
             meta=meta,
             sat_model=sat_model,
             segment_unchaptered=segment_unchaptered,
+            ignore_source_chapters=ignore_source_chapters,
             llm_model=llm_model,
             llm_server=llm_server,
             llm_api_key=llm_api_key,
