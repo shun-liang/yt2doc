@@ -153,7 +153,7 @@ List of available SaT models [here](https://github.com/segment-any-text/wtpsplit
 
 ### Ignore chapters from source
 
-Sometimes, the chaptering of the video/audio at the source does not segment the material in the way you are happy about. You can ask yt2doc to ignore the source chaptering by
+Sometimes, the chaptering of the video/audio at the source does not segment the content in the way you are happy about. You can ask yt2doc to ignore the source chaptering by
 
 ```
 yt2doc --video <video-url> --ignore-chapters --segment-unchaptered --llm-model <model-name>
