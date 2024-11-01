@@ -1,3 +1,11 @@
+```
+uv tool list
+# yt2doc v0.2.9
+# - yt2doc
+
+yt2doc --video https://www.youtube.com/watch\?v\=BTShgZxiNV8 --whisper-backend whisper_cpp --whisper-cpp-executable $HOME/Development/whisper.cpp/main --whisper-cpp-model $HOME/Development/whisper.cpp/models/ggml-large-v3-turbo.bin --sat-model sat-9l -o examples --segment-unchaptered --llm-model gemma2 --skip-cache --ignore-chapters
+```
+
 # Carolynn Levy And Panel (Jon Levy, Jason Kwon) - Startup Legal Mechanics
 
 https://www.youtube.com/watch?v=BTShgZxiNV8
