@@ -44,7 +44,6 @@ class ParagraphsSegmenter:
                 # Find end segment
                 end_idx = start_idx
                 remaining = len(sentence)
-                pos = pos
                 while remaining > 0 and end_idx < len(transcription_segments):
                     segment_remaining = len(transcription_segments[end_idx].text) - pos
                     if remaining <= segment_remaining:

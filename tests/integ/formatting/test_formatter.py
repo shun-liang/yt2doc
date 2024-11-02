@@ -96,7 +96,7 @@ def test_format_chaptered_transcript_basic(
     formatter = MarkdownFormatter(sat=sat)
 
     segments_dicts = [
-        {"start": segment.start_second, "end": segment.end_second, "text": segment.text}
+        {"start_second": segment.start_second, "end_second": segment.end_second, "text": segment.text}
         for segment in mock_transcript_segments
     ]
 
@@ -158,7 +158,7 @@ def test_markdown_formatter_with_segmentation(
     formatter = MarkdownFormatter(sat=sat, topic_segmenter=segmenter)
 
     segments_dicts = [
-        {"start": segment.start_second, "end": segment.end_second, "text": segment.text}
+        {"start_second": segment.start_second, "end_second": segment.end_second, "text": segment.text}
         for segment in mock_transcript_segments
     ]
 
