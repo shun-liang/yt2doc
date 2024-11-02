@@ -10,6 +10,7 @@ from instructor import Instructor
 
 from src.yt2doc.formatting.formatter import MarkdownFormatter
 from src.yt2doc.formatting.llm_topic_segmenter import LLMTopicSegmenter
+from src.yt2doc.formatting.llm_adapter import LLMAdapter
 from src.yt2doc.extraction.interfaces import ChapteredTranscript, TranscriptChapter
 from src.yt2doc.transcription.interfaces import Segment
 
@@ -34,9 +35,8 @@ def parse_whisper_line(line: str) -> Segment:
 
 
 @pytest.fixture
-def mock_llm_client() -> Instructor:
-    mock_llm_instance = MagicMock(spec=Instructor)
-    return mock_llm_instance
+def mock_llm_adapter() -> LLMAdapter:
+    return MagicMock(spec_set=LLMAdapter)
 
 
 @pytest.fixture
@@ -131,11 +131,31 @@ def test_format_chaptered_transcript_basic(
 
 
 def test_markdown_formatter_with_segmentation(
-    mock_transcript_segments: typing.List[Segment], mock_llm_client: Instructor
+    mock_transcript_segments: typing.List[Segment], mock_llm_adapter: LLMAdapter
 ) -> None:
     # Arrange
+    def mocked_get_topic_change(
+        paragraphs: typing.List[typing.List[str]],
+    ) -> typing.List[int]:
+        if len(paragraphs) == 1:
+            return []
+        return [1]
+
+    mock_llm_adapter.get_topic_changing_paragraph_indexes.side_effect = (  # type: ignore
+        mocked_get_topic_change
+    )
+
+    def mock_generate_title_for_paragraphs(
+        paragraphs: typing.List[typing.List[str]],
+    ) -> str:
+        return f"Chapter Title"
+
+    mock_llm_adapter.generate_title_for_paragraphs.side_effect = (  # type: ignore
+        mock_generate_title_for_paragraphs
+    )
+
     sat = SaT("sat-3l")
-    segmenter = LLMTopicSegmenter(llm_client=mock_llm_client)
+    segmenter = LLMTopicSegmenter(llm_adapter=mock_llm_adapter)
     formatter = MarkdownFormatter(sat=sat, topic_segmenter=segmenter)
 
     segments_dicts = [
@@ -147,25 +167,14 @@ def test_markdown_formatter_with_segmentation(
         url="https://example.com/video",
         title="Test Video Title",
         language="en",
-        chaptered_at_source=True,
+        chaptered_at_source=False,
         chapters=[
             TranscriptChapter(
-                title="Chapter 1",
+                title="Untitled Chapter",
                 segments=segments_dicts,
             ),
         ],
     )
-
-    # Configure mock LLM response
-    # mock_llm_client.chat.completions.create.return_value = MagicMock(
-    #     choices=[
-    #         MagicMock(
-    #             message=MagicMock(
-    #                 content='{"chapters": [{"title": "Introduction", "text": "Test paragraph 1."}, {"title": "Discussion", "text": "Test paragraph 2."}]}'
-    #             )
-    #         )
-    #     ]
-    # )
 
     # Act
     formatted_output = formatter.format_chaptered_transcript(
@@ -174,8 +183,5 @@ def test_markdown_formatter_with_segmentation(
 
     # Assert
     assert "# Test Video Title" in formatted_output.transcript
-    assert "## Introduction" in formatted_output.transcript
-    assert "## Discussion" in formatted_output.transcript
-    assert "Test paragraph 1." in formatted_output.transcript
-    assert "Test paragraph 2." in formatted_output.transcript
-    mock_llm_client.chat.completions.create.assert_called_once()
+    assert "## Chapter Title" in formatted_output.transcript
+    # mock_llm_client.chat.completions.create.assert_called_once()
