@@ -39,7 +39,15 @@ class ParagraphsSegmenter:
                 sentence_end = sentence_start + sentence_length
                 
                 # Find start segment and timestamp
-                start_second = transcription_segments[segment_idx].start_second
+                current_segment = transcription_segments[segment_idx]
+                current_segment_length = len(current_segment.text)
+                
+                # If we're not at the start of a segment and the previous text ends with a period,
+                # use the next segment's start time
+                if segment_offset > 0 and current_segment.text[:segment_offset].strip().endswith('.'):
+                    start_second = transcription_segments[min(segment_idx + 1, len(transcription_segments) - 1)].start_second
+                else:
+                    start_second = current_segment.start_second
                 
                 # Move through segments until we reach sentence end
                 while segment_char_pos < sentence_end and segment_idx < len(transcription_segments):
@@ -48,8 +56,9 @@ class ParagraphsSegmenter:
                     
                     if segment_offset + (sentence_end - segment_char_pos) <= current_segment_length:
                         # Sentence ends in current segment
-                        segment_char_pos += sentence_end - segment_char_pos
-                        segment_offset += sentence_end - segment_char_pos
+                        length_to_add = sentence_end - segment_char_pos
+                        segment_char_pos += length_to_add
+                        segment_offset += length_to_add
                         break
                     else:
                         # Move to next segment
