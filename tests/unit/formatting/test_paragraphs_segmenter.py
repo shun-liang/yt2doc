@@ -2,11 +2,11 @@ from unittest.mock import Mock
 
 from wtpsplit import SaT
 
-from yt2doc.formatting.paragraphs_segmenter import ParagraphsSegmenter
-from yt2doc.transcription.interfaces import Segment
+from src.yt2doc.formatting.paragraphs_segmenter import ParagraphsSegmenter
+from src.yt2doc.transcription.interfaces import Segment
 
 
-def test_segment_aligns_timestamps_correctly():
+def test_segment_aligns_timestamps_correctly() -> None:
     # Mock SaT to return known sentence splits
     mock_sat = Mock(spec=SaT)
     mock_sat.split.return_value = [
