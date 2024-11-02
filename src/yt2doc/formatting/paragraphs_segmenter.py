@@ -2,7 +2,7 @@ import typing
 
 from wtpsplit import SaT
 
-from src.yt2doc.formatting import interfaces
+from yt2doc.formatting import interfaces
 from yt2doc.transcription import interfaces as transcription_interfaces
 
 
