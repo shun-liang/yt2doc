@@ -6,7 +6,6 @@ import pytest
 from unittest.mock import MagicMock
 from wtpsplit import SaT
 
-from instructor import Instructor
 
 from src.yt2doc.formatting.formatter import MarkdownFormatter
 from src.yt2doc.formatting.llm_topic_segmenter import LLMTopicSegmenter
@@ -148,7 +147,7 @@ def test_markdown_formatter_with_segmentation(
     def mock_generate_title_for_paragraphs(
         paragraphs: typing.List[typing.List[str]],
     ) -> str:
-        return f"Chapter Title"
+        return "Chapter Title"
 
     mock_llm_adapter.generate_title_for_paragraphs.side_effect = (  # type: ignore
         mock_generate_title_for_paragraphs
