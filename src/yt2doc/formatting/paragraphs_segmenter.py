@@ -13,77 +13,54 @@ class ParagraphsSegmenter:
     def segment(
         self, transcription_segments: typing.Sequence[transcription_interfaces.Segment]
     ) -> typing.Sequence[typing.Sequence[interfaces.Sentence]]:
-        transcription_segment_texts = [s.text for s in transcription_segments]
-        full_text = "".join(transcription_segment_texts)
-        paragraphed_texts: typing.List[typing.List[str]] = self.sat.split(
-            full_text, do_paragraph_segmentation=True, verbose=True
-        )
+        # Get sentences from SaT
+        full_text = "".join(s.text for s in transcription_segments)
+        paragraphed_texts = self.sat.split(full_text, do_paragraph_segmentation=True, verbose=True)
 
-        # Paragraph-Transcription Segment timestamp alignment
-        result: typing.List[typing.List[interfaces.Sentence]] = []
-        
-        # Character position trackers
-        segment_char_pos = 0  # Position in concatenated transcription segments
-        segment_idx = 0       # Current transcription segment
-        segment_offset = 0    # Offset within current segment
+        # Find which segment contains each sentence's start/end
+        result = []
+        text_pos = 0
         
         for paragraph in paragraphed_texts:
-            paragraph_sentences: typing.List[interfaces.Sentence] = []
-            
-            for sentence_text in paragraph:
-                if not sentence_text:
+            sentences = []
+            for sentence in paragraph:
+                if not sentence:
                     continue
-                    
-                sentence_start = segment_char_pos
-                sentence_length = len(sentence_text)
-                sentence_end = sentence_start + sentence_length
-                
-                # Find start segment and timestamp
-                current_segment = transcription_segments[segment_idx]
-                current_segment_length = len(current_segment.text)
-                
-                # If we're not at the start of a segment and the previous text ends with a period,
-                # use the next segment's start time
-                if segment_offset > 0 and current_segment.text[:segment_offset].strip().endswith('.'):
-                    start_second = transcription_segments[min(segment_idx + 1, len(transcription_segments) - 1)].start_second
-                else:
-                    start_second = current_segment.start_second
-                
-                # Move through segments until we reach sentence end
-                while segment_char_pos < sentence_end and segment_idx < len(transcription_segments):
-                    current_segment = transcription_segments[segment_idx]
-                    current_segment_length = len(current_segment.text)
-                    
-                    if segment_offset + (sentence_end - segment_char_pos) <= current_segment_length:
-                        # Sentence ends in current segment
-                        length_to_add = sentence_end - segment_char_pos
-                        segment_char_pos += length_to_add
-                        segment_offset += length_to_add
+
+                # Find start segment
+                start_idx = 0
+                pos = text_pos
+                while start_idx < len(transcription_segments):
+                    if pos < len(transcription_segments[start_idx].text):
                         break
-                    else:
-                        # Move to next segment
-                        remaining_length = current_segment_length - segment_offset
-                        segment_char_pos += remaining_length
-                        
-                        if segment_idx + 1 < len(transcription_segments):
-                            segment_idx += 1
-                            segment_offset = 0
-                        else:
-                            # We've reached the end of segments
-                            segment_char_pos = sentence_end  # Force exit from while loop
-                            break
-                
-                # Use last segment's end time if we've reached the end
-                end_second = transcription_segments[min(segment_idx, len(transcription_segments) - 1)].end_second
-                
-                aligned_sentence = interfaces.Sentence(
-                    text=sentence_text,
-                    start_second=start_second,
-                    end_second=end_second
-                )
-                paragraph_sentences.append(aligned_sentence)
-            
-            if paragraph_sentences:
-                result.append(paragraph_sentences)
-                
+                    pos -= len(transcription_segments[start_idx].text)
+                    start_idx += 1
+
+                # If sentence starts after a period, use next segment's start time
+                start_time = transcription_segments[start_idx].start_second
+                if pos > 0 and transcription_segments[start_idx].text[:pos].strip().endswith('.'):
+                    start_time = transcription_segments[min(start_idx + 1, len(transcription_segments) - 1)].start_second
+
+                # Find end segment
+                end_idx = start_idx
+                remaining = len(sentence)
+                pos = pos
+                while remaining > 0 and end_idx < len(transcription_segments):
+                    segment_remaining = len(transcription_segments[end_idx].text) - pos
+                    if remaining <= segment_remaining:
+                        break
+                    remaining -= segment_remaining
+                    pos = 0
+                    end_idx += 1
+
+                sentences.append(interfaces.Sentence(
+                    text=sentence,
+                    start_second=start_time,
+                    end_second=transcription_segments[end_idx].end_second
+                ))
+                text_pos += len(sentence)
+
+            if sentences:
+                result.append(sentences)
+
         return result
