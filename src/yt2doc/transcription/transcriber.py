@@ -161,15 +161,15 @@ class Transcriber:
                 )
                 for segment in segments:
                     aligned_segment = interfaces.Segment(
-                        start=chapter.start_time + segment.start,
-                        end=chapter.start_time + segment.end,
+                        start_second=chapter.start_time + segment.start_second,
+                        end_second=chapter.start_time + segment.end_second,
                         text=self._fix_comma(
                             segment_text=segment.text, language_code=language_code
                         ),
                     )
                     chapter_segments.append(aligned_segment)
-                    progress_bar.update(aligned_segment.end - current_timestamp)
-                    current_timestamp = aligned_segment.end
+                    progress_bar.update(aligned_segment.end_second - current_timestamp)
+                    current_timestamp = aligned_segment.end_second
 
                 chaptered_transcriptions.append(
                     interfaces.ChapterTranscription(

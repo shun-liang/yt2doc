@@ -11,7 +11,7 @@ class LLMAdapter:
 
     def get_topic_changing_paragraph_indexes(
         self, paragraphs: typing.List[typing.List[str]]
-    ) -> typing.List[int]:
+    ) -> typing.Sequence[int]:
         def validate_paragraph_indexes(v: typing.List[int]) -> typing.List[int]:
             n = len(paragraphs)
             unique_values = set(v)

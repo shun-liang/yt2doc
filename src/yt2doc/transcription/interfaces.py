@@ -8,8 +8,8 @@ from yt2doc.media import interfaces as youtube_interfaces
 
 
 class Segment(BaseModel):
-    start: float
-    end: float
+    start_second: float
+    end_second: float
     text: str
 
 

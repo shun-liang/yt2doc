@@ -26,8 +26,8 @@ def parse_whisper_line(line: str) -> Segment:
     if match:
         start_time, end_time, text = match.groups()
         return Segment(
-            start=time_to_seconds(start_time),
-            end=time_to_seconds(end_time),
+            start_second=time_to_seconds(start_time),
+            end_second=time_to_seconds(end_time),
             text=text,
         )
     assert False, "Line does not match expected whisper segment pattern."
@@ -96,7 +96,7 @@ def test_format_chaptered_transcript_basic(
     formatter = MarkdownFormatter(sat=sat)
 
     segments_dicts = [
-        {"start": segment.start, "end": segment.end, "text": segment.text}
+        {"start": segment.start_second, "end": segment.end_second, "text": segment.text}
         for segment in mock_transcript_segments
     ]
 
@@ -158,7 +158,7 @@ def test_markdown_formatter_with_segmentation(
     formatter = MarkdownFormatter(sat=sat, topic_segmenter=segmenter)
 
     segments_dicts = [
-        {"start": segment.start, "end": segment.end, "text": segment.text}
+        {"start": segment.start_second, "end": segment.end_second, "text": segment.text}
         for segment in mock_transcript_segments
     ]
 
@@ -183,4 +183,3 @@ def test_markdown_formatter_with_segmentation(
     # Assert
     assert "# Test Video Title" in formatted_output.transcript
     assert "## Chapter Title" in formatted_output.transcript
-    # mock_llm_client.chat.completions.create.assert_called_once()

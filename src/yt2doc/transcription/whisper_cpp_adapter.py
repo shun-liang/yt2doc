@@ -46,8 +46,8 @@ class WhisperCppAdapter:
         if match:
             start_time, end_time, text = match.groups()
             return interfaces.Segment(
-                start=self._time_to_seconds(start_time),
-                end=self._time_to_seconds(end_time),
+                start_second=self._time_to_seconds(start_time),
+                end_second=self._time_to_seconds(end_time),
                 text=text,
             )
         raise CannotParseWhisperCppLineException(

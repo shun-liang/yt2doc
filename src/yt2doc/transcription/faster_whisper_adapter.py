@@ -22,6 +22,8 @@ class FasterWhisperAdapter:
             audio=audio_path, initial_prompt=initial_prompt, vad_filter=True
         )
         return (
-            interfaces.Segment(start=segment.start, end=segment.end, text=segment.text)
+            interfaces.Segment(
+                start_second=segment.start, end_second=segment.end, text=segment.text
+            )
             for segment in segments
         )
