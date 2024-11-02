@@ -20,6 +20,16 @@ class FormattedPlaylist(BaseModel):
     transcripts: typing.Sequence[FormattedTranscript]
 
 
+class ILLMAdapter(typing.Protocol):
+    def get_topic_changing_paragraph_indexes(
+        self, paragraphs: typing.List[typing.List[str]]
+    ) -> typing.List[int]: ...
+
+    def generate_title_for_paragraphs(
+        self, paragraphs: typing.List[typing.List[str]]
+    ) -> str: ...
+
+
 class ITopicSegmenter(typing.Protocol):
     def segment(
         self, paragraphs: typing.List[typing.List[str]]

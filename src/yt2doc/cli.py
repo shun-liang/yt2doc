@@ -87,7 +87,9 @@ def main(
     ignore_source_chapters: typing.Annotated[
         bool,
         typer.Option(
-            "--ignore-source-chapters", "--ignore-chapters", help="Ignore original chapters from the source"
+            "--ignore-source-chapters",
+            "--ignore-chapters",
+            help="Ignore original chapters from the source",
         ),
     ] = False,
 ) -> None:

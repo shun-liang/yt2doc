@@ -14,6 +14,7 @@ from yt2doc.extraction import interfaces as extraction_interfaces
 from yt2doc.extraction.extractor import Extractor
 from yt2doc.formatting.formatter import MarkdownFormatter
 from yt2doc.formatting.llm_topic_segmenter import LLMTopicSegmenter
+from yt2doc.formatting.llm_adapter import LLMAdapter
 from yt2doc.yt2doc import Yt2Doc
 
 
@@ -54,8 +55,8 @@ def get_yt2doc(
             ),
             mode=instructor.Mode.JSON,
         )
-
-        llm_topic_segmenter = LLMTopicSegmenter(llm_client=llm_client, model=llm_model)
+        llm_adapter = LLMAdapter(llm_client=llm_client, llm_model=llm_model)
+        llm_topic_segmenter = LLMTopicSegmenter(llm_adapter=llm_adapter)
         formatter = MarkdownFormatter(sat=sat, topic_segmenter=llm_topic_segmenter)
     else:
         formatter = MarkdownFormatter(sat=sat)
