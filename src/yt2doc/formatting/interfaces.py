@@ -8,7 +8,6 @@ from yt2doc.transcription import interfaces as transcription_interfaces
 
 class Sentence(BaseModel):
     start_second: float
-    end_second: float
     text: str
 
 

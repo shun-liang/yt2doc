@@ -17,49 +17,56 @@ class ParagraphsSegmenter:
         full_text = "".join(s.text for s in transcription_segments)
         paragraphed_texts = self.sat.split(full_text, do_paragraph_segmentation=True, verbose=True)
 
-        # Find which segment contains each sentence's start/end
-        result = []
-        text_pos = 0
+        # Align timestamps
+        segments_text = "".join(s.text for s in transcription_segments)
+        segments_pos = 0  # Position in segments text
+        curr_segment_idx = 0  # Current segment index
+        curr_segment_offset = 0  # Position within current segment
+        
+        result_paragraphs = []
         
         for paragraph in paragraphed_texts:
-            sentences = []
+            result_sentences = []
+            
             for sentence in paragraph:
-                if not sentence:
-                    continue
-
-                # Find start segment
-                start_idx = 0
-                pos = text_pos
-                while start_idx < len(transcription_segments):
-                    if pos < len(transcription_segments[start_idx].text):
+                # Find matching position for this sentence
+                sentence_pos = 0  # Position in current sentence
+                
+                # Find start position
+                start_segment_idx = curr_segment_idx
+                
+                # Match characters exactly including spaces
+                while sentence_pos < len(sentence):
+                    if segments_pos >= len(segments_text):
                         break
-                    pos -= len(transcription_segments[start_idx].text)
-                    start_idx += 1
-
-                # If sentence starts after a period, use next segment's start time
-                start_time = transcription_segments[start_idx].start_second
-                if pos > 0 and transcription_segments[start_idx].text[:pos].strip().endswith('.'):
-                    start_time = transcription_segments[min(start_idx + 1, len(transcription_segments) - 1)].start_second
-
-                # Find end segment
-                end_idx = start_idx
-                remaining = len(sentence)
-                while remaining > 0 and end_idx < len(transcription_segments):
-                    segment_remaining = len(transcription_segments[end_idx].text) - pos
-                    if remaining <= segment_remaining:
-                        break
-                    remaining -= segment_remaining
-                    pos = 0
-                    end_idx += 1
-
-                sentences.append(interfaces.Sentence(
-                    text=sentence,
-                    start_second=start_time,
-                    end_second=transcription_segments[end_idx].end_second
-                ))
-                text_pos += len(sentence)
-
-            if sentences:
-                result.append(sentences)
-
-        return result
+                    
+                    # Match characters exactly
+                    if sentence[sentence_pos] == segments_text[segments_pos]:
+                        sentence_pos += 1
+                        segments_pos += 1
+                        curr_segment_offset += 1
+                        # Update segment index if needed
+                        while (curr_segment_idx < len(transcription_segments) - 1 and 
+                               curr_segment_offset >= len(transcription_segments[curr_segment_idx].text)):
+                            curr_segment_offset = 0
+                            curr_segment_idx += 1
+                    else:
+                        # If no match, move forward in segments
+                        segments_pos += 1
+                        curr_segment_offset += 1
+                        while (curr_segment_idx < len(transcription_segments) - 1 and 
+                               curr_segment_offset >= len(transcription_segments[curr_segment_idx].text)):
+                            curr_segment_offset = 0
+                            curr_segment_idx += 1
+                
+                # Create sentence with aligned timestamp
+                result_sentences.append(
+                    interfaces.Sentence(
+                        text=sentence,
+                        start_second=transcription_segments[start_segment_idx].start_second
+                    )
+                )
+            
+            result_paragraphs.append(result_sentences)
+        
+        return result_paragraphs
