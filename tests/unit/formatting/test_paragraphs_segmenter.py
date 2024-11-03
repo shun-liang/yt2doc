@@ -16,7 +16,7 @@ def test_segment_aligns_timestamps_correctly() -> None:
         ],
         [
             "Another paragraph here. ",  # Second paragraph, single sentence
-            "With multiple sentences. ",  # Second paragraph, second sentence
+            "Only 0.1 percent people get it. ",
             "And even more. "  # Second paragraph, third sentence
         ],
         [
@@ -40,8 +40,8 @@ def test_segment_aligns_timestamps_correctly() -> None:
         Segment(start_second=1.0, end_second=2.0, text=" world! This"),
         Segment(start_second=2.0, end_second=3.0, text=" is a"),
         Segment(start_second=3.0, end_second=4.0, text=" test. Another "),
-        Segment(start_second=4.0, end_second=5.0, text="paragraph here. With "),
-        Segment(start_second=5.0, end_second=6.0, text="multiple sentences. And "),
+        Segment(start_second=4.0, end_second=5.0, text="paragraph here. Only "),
+        Segment(start_second=5.0, end_second=6.0, text="0.1 percent people get it. And "),
         Segment(start_second=6.0, end_second=7.0, text="even more. This is a "),
         Segment(start_second=7.0, end_second=8.0, text="longer sentence that spans "),
         Segment(start_second=8.0, end_second=9.0, text="multiple segments and tests "),
@@ -81,7 +81,7 @@ def test_segment_aligns_timestamps_correctly() -> None:
     assert result[1][0].start_second == 4.0
     assert result[1][0].end_second == 5.0
     
-    assert result[1][1].text == "With multiple sentences. "
+    assert result[1][1].text == "Only 0.1 percent people get it. "
     assert result[1][1].start_second == 5.0
     assert result[1][1].end_second == 6.0
     
@@ -122,7 +122,7 @@ def test_segment_aligns_timestamps_correctly() -> None:
     
     # Verify SaT was called correctly with complete text
     mock_sat.split.assert_called_once_with(
-        "Hello world! This is a test. Another paragraph here. With multiple sentences. "
+        "Hello world! This is a test. Another paragraph here. Only 0.1 percent people get it. "
         "And even more. This is a longer sentence that spans multiple segments and tests "
         "our handling of longer text blocks. Short text. Followed by another. And one "
         "more for good measure. Final paragraph to conclude our test. With some extra "
