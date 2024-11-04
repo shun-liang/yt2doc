@@ -133,6 +133,7 @@ def test_format_chaptered_transcript_basic(
         "Hi class. So today I'll be talking about climate change"
         in formatted_output.transcript
     )
+    assert formatted_output.transcript.count("\n\n") > 6
 
 
 def test_markdown_formatter_with_segmentation(
@@ -196,3 +197,4 @@ def test_markdown_formatter_with_segmentation(
     # Assert
     assert "# Test Video Title" in formatted_output.transcript
     assert "## Chapter Title" in formatted_output.transcript
+    assert formatted_output.transcript.count("\n\n") > 6
