@@ -52,7 +52,12 @@ class MarkdownFormatter:
 
         else:
             for chapter in chaptered_transcript.chapters:
-                chapter_full_text = "".join(s.text for s in chapter.segments)
+                paragraphed_sentences = self.paragraphs_segmenter.segment(
+                    transcription_segments=chapter.segments
+                )
+                chapter_full_text = self._paragraphs_to_text(
+                    paragraphs=paragraphed_sentences
+                )
                 chapter_and_text_list.append((chapter.title, chapter_full_text.strip()))
 
         transcript_text = "\n\n".join(
