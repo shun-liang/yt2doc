@@ -13,7 +13,7 @@ class Sentence(BaseModel):
 
 class Chapter(BaseModel):
     title: str
-    text: str
+    paragraphs: typing.Sequence[typing.Sequence[Sentence]]
 
 
 class FormattedTranscript(BaseModel):
@@ -29,7 +29,7 @@ class FormattedPlaylist(BaseModel):
 class IParagraphsSegmenter(typing.Protocol):
     def segment(
         self, transcription_segments: typing.Sequence[transcription_interfaces.Segment]
-    ) -> typing.Sequence[typing.Sequence[Sentence]]: ...
+    ) -> typing.List[typing.List[Sentence]]: ...
 
 
 class ILLMAdapter(typing.Protocol):
@@ -44,7 +44,7 @@ class ILLMAdapter(typing.Protocol):
 
 class ITopicSegmenter(typing.Protocol):
     def segment(
-        self, paragraphs: typing.List[typing.List[str]]
+        self, sentences_in_paragraphs: typing.List[typing.List[Sentence]]
     ) -> typing.Sequence[Chapter]: ...
 
 

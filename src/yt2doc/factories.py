@@ -15,6 +15,7 @@ from yt2doc.extraction.extractor import Extractor
 from yt2doc.formatting.formatter import MarkdownFormatter
 from yt2doc.formatting.llm_topic_segmenter import LLMTopicSegmenter
 from yt2doc.formatting.llm_adapter import LLMAdapter
+from yt2doc.formatting.paragraphs_segmenter import ParagraphsSegmenter
 from yt2doc.yt2doc import Yt2Doc
 
 
@@ -43,6 +44,7 @@ def get_yt2doc(
     )
 
     sat = SaT(sat_model)
+    paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
     if segment_unchaptered is True:
         if llm_model is None:
             raise LLMModelNotSpecified(
@@ -57,9 +59,12 @@ def get_yt2doc(
         )
         llm_adapter = LLMAdapter(llm_client=llm_client, llm_model=llm_model)
         llm_topic_segmenter = LLMTopicSegmenter(llm_adapter=llm_adapter)
-        formatter = MarkdownFormatter(sat=sat, topic_segmenter=llm_topic_segmenter)
+        formatter = MarkdownFormatter(
+            paragraphs_segmenter=paragraphs_segmenter,
+            topic_segmenter=llm_topic_segmenter,
+        )
     else:
-        formatter = MarkdownFormatter(sat=sat)
+        formatter = MarkdownFormatter(paragraphs_segmenter=paragraphs_segmenter)
 
     video_info_extractor = MediaInfoExtractor(temp_dir=temp_dir)
     transcriber = Transcriber(

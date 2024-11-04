@@ -10,6 +10,7 @@ from wtpsplit import SaT
 from src.yt2doc.formatting.formatter import MarkdownFormatter
 from src.yt2doc.formatting.llm_topic_segmenter import LLMTopicSegmenter
 from src.yt2doc.formatting.llm_adapter import LLMAdapter
+from src.yt2doc.formatting.paragraphs_segmenter import ParagraphsSegmenter
 from src.yt2doc.extraction.interfaces import ChapteredTranscript, TranscriptChapter
 from src.yt2doc.transcription.interfaces import Segment
 
@@ -93,10 +94,15 @@ def test_format_chaptered_transcript_basic(
 ) -> None:
     # Arrange
     sat = SaT("sat-3l")
-    formatter = MarkdownFormatter(sat=sat)
+    paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
+    formatter = MarkdownFormatter(paragraphs_segmenter=paragraphs_segmenter)
 
     segments_dicts = [
-        {"start_second": segment.start_second, "end_second": segment.end_second, "text": segment.text}
+        {
+            "start_second": segment.start_second,
+            "end_second": segment.end_second,
+            "text": segment.text,
+        }
         for segment in mock_transcript_segments
     ]
 
@@ -154,11 +160,18 @@ def test_markdown_formatter_with_segmentation(
     )
 
     sat = SaT("sat-3l")
+    paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
     segmenter = LLMTopicSegmenter(llm_adapter=mock_llm_adapter)
-    formatter = MarkdownFormatter(sat=sat, topic_segmenter=segmenter)
+    formatter = MarkdownFormatter(
+        paragraphs_segmenter=paragraphs_segmenter, topic_segmenter=segmenter
+    )
 
     segments_dicts = [
-        {"start_second": segment.start_second, "end_second": segment.end_second, "text": segment.text}
+        {
+            "start_second": segment.start_second,
+            "end_second": segment.end_second,
+            "text": segment.text,
+        }
         for segment in mock_transcript_segments
     ]
 
