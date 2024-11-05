@@ -66,13 +66,13 @@ def get_yt2doc(
     else:
         formatter = MarkdownFormatter(paragraphs_segmenter=paragraphs_segmenter)
 
-    video_info_extractor = MediaInfoExtractor(temp_dir=temp_dir)
+    media_info_extractor = MediaInfoExtractor(temp_dir=temp_dir)
     transcriber = Transcriber(
         temp_dir=temp_dir,
         whisper_adapter=whisper_adapter,
     )
     extractor = Extractor(
-        video_info_extractor=video_info_extractor,
+        media_info_extractor=media_info_extractor,
         transcriber=transcriber,
         file_cache=file_cache,
         ignore_source_chapters=ignore_source_chapters,

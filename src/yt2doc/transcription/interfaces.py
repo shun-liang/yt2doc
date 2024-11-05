@@ -33,5 +33,5 @@ class IWhisperAdapter(typing.Protocol):
 
 class ITranscriber(typing.Protocol):
     def transcribe(
-        self, audio_path: Path, video_info: youtube_interfaces.MediaInfo
+        self, audio_path: Path, media_info: youtube_interfaces.MediaInfo
     ) -> Transcription: ...

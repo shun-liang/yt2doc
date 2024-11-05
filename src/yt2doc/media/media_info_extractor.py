@@ -16,6 +16,7 @@ logger = logging.getLogger(__file__)
 class YtDLPResponse(BaseModel):
     video_id: str = Field(alias="id")
     webpage_url: str
+    webpage_url_domain: str
     title: str
     description: str
     chapters: typing.Optional[typing.Sequence[interfaces.MediaChapter]] = None
@@ -67,7 +68,7 @@ class MediaInfoExtractor:
     def __init__(self, temp_dir: Path):
         self.temp_dir = temp_dir
 
-    def extract_video_info(self, video_url: str) -> interfaces.MediaInfo:
+    def extract_media_info(self, video_url: str) -> interfaces.MediaInfo:
         ydl_opts = {
             "quiet": True,
         }
@@ -80,6 +81,8 @@ class MediaInfoExtractor:
         return interfaces.MediaInfo(
             video_id=parsed_response.video_id,
             title=parsed_response.title,
+            webpage_url=parsed_response.webpage_url,
+            webpage_url_domain=parsed_response.webpage_url_domain,
             chapters=_merge_short_chapters(parsed_response.chapters or []),
             description=parsed_response.description,
         )

@@ -11,20 +11,29 @@ class MarkdownFormatter:
     def __init__(
         self,
         paragraphs_segmenter: interfaces.IParagraphsSegmenter,
+        # timestamp_paragraphs: bool,
         topic_segmenter: typing.Optional[interfaces.ITopicSegmenter] = None,
     ) -> None:
         self.paragraphs_segmenter = paragraphs_segmenter
         self.topic_segmenter = topic_segmenter
         self.video_title_template = "# {name}"
         self.chapter_title_template = "## {name}"
+        # self.timestamp_paragraphs = timestamp_paragraphs
 
     @staticmethod
     def _paragraphs_to_text(
         paragraphs: typing.Sequence[typing.Sequence[interfaces.Sentence]],
+        # timestamp_paragraphs: bool,
+        # webpage_url: str,
+        # webpage_url_domain: str,
     ) -> str:
         paragraph_texts = []
         for paragraph in paragraphs:
+            first_sentence = paragraph[0]
             paragraph_text = "".join(sentence.text for sentence in paragraph)
+            # if timestamp_paragraphs:
+            #     if webpage_url_domain == "youtube.com":
+            #         timestamp_prefix = "[\({}\)]()"
             paragraph_texts.append(paragraph_text)
         return "\n\n".join(paragraph_texts)
 

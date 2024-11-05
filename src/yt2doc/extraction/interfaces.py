@@ -13,6 +13,8 @@ class TranscriptChapter(BaseModel):
 class ChapteredTranscript(BaseModel):
     url: str
     title: str
+    webpage_url: str
+    webpage_url_domain: str
     language: str
     chapters: typing.Sequence[TranscriptChapter]
     chaptered_at_source: bool

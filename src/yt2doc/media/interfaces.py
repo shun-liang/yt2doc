@@ -14,6 +14,8 @@ class MediaChapter(BaseModel):
 class MediaInfo(BaseModel):
     video_id: str
     title: str
+    webpage_url: str
+    webpage_url_domain: str
     chapters: typing.Sequence[MediaChapter]
     description: str
 
@@ -23,7 +25,7 @@ class YtPlaylistInfo(BaseModel):
     video_urls: typing.Sequence[str]
 
 
-class IYtVideoInfoExtractor(typing.Protocol):
-    def extract_video_info(self, video_url: str) -> MediaInfo: ...
+class IYtMediaInfoExtractor(typing.Protocol):
+    def extract_media_info(self, video_url: str) -> MediaInfo: ...
     def extract_audio(self, video_url: str) -> Path: ...
     def extract_playlist_info(self, playlist_url: str) -> YtPlaylistInfo: ...
