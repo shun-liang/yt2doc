@@ -5,10 +5,30 @@ import yt_dlp
 
 from pathlib import Path
 
+from pydantic import BaseModel, Field
+
 from yt2doc.media import interfaces
 
 
 logger = logging.getLogger(__file__)
+
+
+class YtDLPResponse(BaseModel):
+    video_id: str = Field(alias="id")
+    webpage_url: str
+    title: str
+    description: str
+    chapters: typing.Optional[typing.Sequence[interfaces.MediaChapter]] = None
+
+
+class YtDLPPlaylistEntry(BaseModel):
+    url: str
+    title: str
+
+
+class YtDLPPlaylistResponse(BaseModel):
+    title: str
+    entries: typing.Sequence[YtDLPPlaylistEntry]
 
 
 def _length(chapter: interfaces.MediaChapter) -> float:
@@ -55,19 +75,13 @@ class MediaInfoExtractor:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             response = ydl.extract_info(video_url, download=False)
 
-        video_id = response["id"]
-        title = response["title"]
-        chapter_objects = response.get("chapters") or []
-        chapters = _merge_short_chapters(
-            [interfaces.MediaChapter(**chapter) for chapter in chapter_objects]
-        )
-        description = response["description"]
+        parsed_response = YtDLPResponse(**response)
 
         return interfaces.MediaInfo(
-            video_id=video_id,
-            title=title,
-            chapters=chapters,
-            description=description,
+            video_id=parsed_response.video_id,
+            title=parsed_response.title,
+            chapters=_merge_short_chapters(parsed_response.chapters or []),
+            description=parsed_response.description,
         )
 
     def extract_audio(self, video_url: str) -> Path:
@@ -86,8 +100,8 @@ class MediaInfoExtractor:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             response = ydl.extract_info(video_url, download=True)
 
-        video_id = response["id"]
-        audio_path = self.temp_dir / f"{video_id}.m4a"
+        parsed_response = YtDLPResponse(**response)
+        audio_path = self.temp_dir / f"{parsed_response.video_id}.m4a"
         return audio_path
 
     def extract_playlist_info(self, playlist_url: str) -> interfaces.YtPlaylistInfo:
@@ -99,14 +113,14 @@ class MediaInfoExtractor:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             playlist_info = ydl.extract_info(playlist_url, download=False)
 
-        title: str = playlist_info["title"]
-        entries = playlist_info["entries"]
+        parsed_playlist_info = YtDLPPlaylistResponse(**playlist_info)
+
         video_urls = [
-            entry["url"]
-            for entry in entries
-            if entry["title"] not in ["[Private video]", "[Deleted video]"]
+            entry.url
+            for entry in parsed_playlist_info.entries
+            if entry.title not in ["[Private video]", "[Deleted video]"]
         ]
         return interfaces.YtPlaylistInfo(
-            title=title,
+            title=parsed_playlist_info.title,
             video_urls=video_urls,
         )
