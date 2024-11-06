@@ -1,6 +1,8 @@
 import typing
 import logging
 
+from datetime import timedelta
+
 from yt2doc.extraction import interfaces as extraction_interfaces
 from yt2doc.formatting import interfaces
 
@@ -11,29 +13,35 @@ class MarkdownFormatter:
     def __init__(
         self,
         paragraphs_segmenter: interfaces.IParagraphsSegmenter,
-        # timestamp_paragraphs: bool,
+        to_timestamp_paragraphs: bool,
         topic_segmenter: typing.Optional[interfaces.ITopicSegmenter] = None,
     ) -> None:
         self.paragraphs_segmenter = paragraphs_segmenter
         self.topic_segmenter = topic_segmenter
         self.video_title_template = "# {name}"
         self.chapter_title_template = "## {name}"
-        # self.timestamp_paragraphs = timestamp_paragraphs
+        self.to_timestamp_paragraphs = to_timestamp_paragraphs
 
     @staticmethod
     def _paragraphs_to_text(
         paragraphs: typing.Sequence[typing.Sequence[interfaces.Sentence]],
-        # timestamp_paragraphs: bool,
-        # webpage_url: str,
-        # webpage_url_domain: str,
+        video_id: str,
+        webpage_url_domain: str,
+        to_timestamp_paragraphs: bool,
     ) -> str:
         paragraph_texts = []
         for paragraph in paragraphs:
             first_sentence = paragraph[0]
             paragraph_text = "".join(sentence.text for sentence in paragraph)
-            # if timestamp_paragraphs:
-            #     if webpage_url_domain == "youtube.com":
-            #         timestamp_prefix = "[\({}\)]()"
+            paragraph_text = paragraph_text.strip()
+            if to_timestamp_paragraphs:
+                paragraph_start_second = round(first_sentence.start_second)
+                paragraph_start_h_m_s = str(timedelta(seconds=paragraph_start_second))
+                if webpage_url_domain == "youtube.com":
+                    timestamp_prefix = f"[({paragraph_start_h_m_s})](https://youtu.be/{video_id}?t={paragraph_start_second})"
+                else:
+                    timestamp_prefix = f"({paragraph_start_h_m_s})"
+                paragraph_text = f"{timestamp_prefix} {paragraph_text}"
             paragraph_texts.append(paragraph_text)
         return "\n\n".join(paragraph_texts)
 
@@ -55,7 +63,15 @@ class MarkdownFormatter:
                 sentences_in_paragraphs=paragraphed_sentences
             )
             chapter_and_text_list = [
-                (chapter.title, self._paragraphs_to_text(chapter.paragraphs))
+                (
+                    chapter.title,
+                    self._paragraphs_to_text(
+                        paragraphs=chapter.paragraphs,
+                        video_id=chaptered_transcript.video_id,
+                        webpage_url_domain=chaptered_transcript.webpage_url_domain,
+                        to_timestamp_paragraphs=self.to_timestamp_paragraphs,
+                    ),
+                )
                 for chapter in chapters
             ]
 
@@ -65,7 +81,10 @@ class MarkdownFormatter:
                     transcription_segments=chapter.segments
                 )
                 chapter_full_text = self._paragraphs_to_text(
-                    paragraphs=paragraphed_sentences
+                    paragraphs=paragraphed_sentences,
+                    video_id=chaptered_transcript.video_id,
+                    webpage_url_domain=chaptered_transcript.webpage_url_domain,
+                    to_timestamp_paragraphs=self.to_timestamp_paragraphs,
                 )
                 chapter_and_text_list.append((chapter.title, chapter_full_text.strip()))
 

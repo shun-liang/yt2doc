@@ -74,6 +74,11 @@ def main(
         "--llm-api-key",
         help="API key for the LLM server; No need to set if using local Ollama server",
     ),
+    to_timestamp_paragraphs: bool = typer.Option(
+        False,
+        "--timestamp-paragraphs",
+        help="Prepend timestamp to paragraphs",
+    ),
     skip_cache: typing.Annotated[
         bool,
         typer.Option("--skip-cache", help="If should skip reading from cache"),
@@ -145,6 +150,7 @@ def main(
             sat_model=sat_model,
             segment_unchaptered=segment_unchaptered,
             ignore_source_chapters=ignore_source_chapters,
+            to_timestamp_paragraphs=to_timestamp_paragraphs,
             llm_model=llm_model,
             llm_server=llm_server,
             llm_api_key=llm_api_key,

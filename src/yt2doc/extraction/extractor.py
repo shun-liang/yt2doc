@@ -65,8 +65,8 @@ class Extractor:
 
         chaptered_transcript = interfaces.ChapteredTranscript(
             url=video_url,
+            video_id=media_info.video_id,
             title=media_info.title,
-            webpage_url=media_info.webpage_url,
             webpage_url_domain=media_info.webpage_url_domain,
             chapters=transcripts_by_chapter,
             chaptered_at_source=len(media_info.chapters) > 0,
