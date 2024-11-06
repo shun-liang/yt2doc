@@ -95,7 +95,9 @@ def test_format_chaptered_transcript_basic(
     # Arrange
     sat = SaT("sat-3l")
     paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
-    formatter = MarkdownFormatter(paragraphs_segmenter=paragraphs_segmenter)
+    formatter = MarkdownFormatter(
+        paragraphs_segmenter=paragraphs_segmenter, to_timestamp_paragraphs=False
+    )
 
     segments_dicts = [
         {
@@ -108,6 +110,8 @@ def test_format_chaptered_transcript_basic(
 
     test_transcript = ChapteredTranscript(
         url="https://example.com/video",
+        webpage_url_domain="example.com",
+        video_id="video",
         title="Test Video Title",
         language="en",
         chaptered_at_source=True,
@@ -164,7 +168,9 @@ def test_markdown_formatter_with_segmentation(
     paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
     segmenter = LLMTopicSegmenter(llm_adapter=mock_llm_adapter)
     formatter = MarkdownFormatter(
-        paragraphs_segmenter=paragraphs_segmenter, topic_segmenter=segmenter
+        paragraphs_segmenter=paragraphs_segmenter,
+        to_timestamp_paragraphs=False,
+        topic_segmenter=segmenter,
     )
 
     segments_dicts = [
@@ -179,6 +185,8 @@ def test_markdown_formatter_with_segmentation(
     test_transcript = ChapteredTranscript(
         url="https://example.com/video",
         title="Test Video Title",
+        webpage_url_domain="example.com",
+        video_id="video",
         language="en",
         chaptered_at_source=False,
         chapters=[
