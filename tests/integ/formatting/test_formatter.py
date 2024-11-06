@@ -138,6 +138,7 @@ def test_format_chaptered_transcript_basic(
         in formatted_output.transcript
     )
     assert formatted_output.transcript.count("\n\n") > 6
+    assert "(0:00:00)" not in formatted_output.transcript
 
 
 def test_markdown_formatter_with_segmentation(
@@ -206,3 +207,48 @@ def test_markdown_formatter_with_segmentation(
     assert "# Test Video Title" in formatted_output.transcript
     assert "## Chapter Title" in formatted_output.transcript
     assert formatted_output.transcript.count("\n\n") > 6
+    assert "(0:00:00)" not in formatted_output.transcript
+
+
+def test_format_chaptered_transcript_timestamp_paragraphs(
+    mock_transcript_segments: typing.List[Segment],
+) -> None:
+    # Arrange
+    sat = SaT("sat-3l")
+    paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
+    formatter = MarkdownFormatter(
+        paragraphs_segmenter=paragraphs_segmenter, to_timestamp_paragraphs=True
+    )
+
+    segments_dicts = [
+        {
+            "start_second": segment.start_second,
+            "end_second": segment.end_second,
+            "text": segment.text,
+        }
+        for segment in mock_transcript_segments
+    ]
+
+    test_transcript = ChapteredTranscript(
+        url="https://example.com/video",
+        webpage_url_domain="example.com",
+        video_id="video",
+        title="Test Video Title",
+        language="en",
+        chaptered_at_source=True,
+        chapters=[
+            TranscriptChapter(
+                title="Chapter 1",
+                segments=segments_dicts,
+            ),
+        ],
+    )
+
+    # Act
+    formatted_output = formatter.format_chaptered_transcript(
+        chaptered_transcript=test_transcript
+    )
+
+    # Assert
+    assert formatted_output.title == "Test Video Title"
+    assert "(0:00:00)" in formatted_output.transcript
