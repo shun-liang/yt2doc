@@ -6,7 +6,7 @@ yt2doc transcribes videos & audios online into readable Markdown documents.
 
 Supported video/audio sources:
 * YouTube
-* Apple Podcast
+* Apple Podcasts
 * Twitter
 
 yt2doc is meant to work fully locally, without invoking any external API. The OpenAI SDK dependency is required solely to interact with a local LLM server such as [Ollama](https://github.com/ollama/ollama).
@@ -113,12 +113,12 @@ By default, yt2doc talks to Ollama at `http://localhost:11434/v1` to segment the
 yt2doc --video <video-url> --segment-unchaptered --llm-server <llm-server-url> --llm-api-key <llm-server-api-key> --llm-model <model-name>
 ```
 
-### Transcribe Apple Podcast
+### Transcribe Apple Podcasts
 
-To transcribe a podcast episode on Apple Podcast:
+To transcribe a podcast episode on Apple Podcasts:
 
 ```
-yt2doc --audio <apple-podcast-episode-url> --segment-unchaptered --llm-model <model-name>
+yt2doc --audio <apple-podcasts-episode-url> --segment-unchaptered --llm-model <model-name>
 ```
 
 ### Whisper configuration
@@ -150,6 +150,13 @@ yt2doc --video <video-url> --sat-model <sat-model>
 
 List of available SaT models [here](https://github.com/segment-any-text/wtpsplit?tab=readme-ov-file#available-models).
 
+
+### Timestamping paragraphs
+
+Paragraphs in the generated Markdown can be timestamped by
+```
+yt2doc --video <video-url> --timestamp-paragraphs
+```
 
 ### Ignore chapters from source
 
