@@ -69,18 +69,18 @@ class Transcriber:
     def _get_initial_prompt(
         self,
         language_code: str,
-        video_info: youtube_interfaces.MediaInfo,
+        media_info: youtube_interfaces.MediaInfo,
     ) -> str:
         punctuations_ = punctuations.get_punctuations(language_code=language_code)
         cleaned_title = self._clean_title(
-            title=video_info.title,
+            title=media_info.title,
             punctuations=punctuations_,
         )
         cleaned_video_description = self._clean_video_description(
-            video_info.description, punctuations=punctuations_
+            media_info.description, punctuations=punctuations_
         )
         chapter_titles = f"{punctuations_.comma}".join(
-            c.title for c in video_info.chapters
+            c.title for c in media_info.chapters
         )
         return f"{cleaned_title}{punctuations_.full_stop} {cleaned_video_description} {chapter_titles}"
 
@@ -114,14 +114,14 @@ class Transcriber:
         return wav_audio_path
 
     def transcribe(
-        self, audio_path: Path, video_info: youtube_interfaces.MediaInfo
+        self, audio_path: Path, media_info: youtube_interfaces.MediaInfo
     ) -> interfaces.Transcription:
         wav_audio_path = self._convert_audio_to_wav(audio_path=audio_path)
 
         language_code = self.whisper_adapter.detect_language(audio_path=wav_audio_path)
         initial_prompt = self._get_initial_prompt(
             language_code=language_code,
-            video_info=video_info,
+            media_info=media_info,
         )
         logger.info(f"Initial prompt: {initial_prompt}")
 
@@ -133,8 +133,8 @@ class Transcriber:
 
         rounded_full_audio_duration = round(full_audio_duration, 2)
         current_timestamp = 0.0
-        if len(video_info.chapters) > 0:
-            chapters = video_info.chapters
+        if len(media_info.chapters) > 0:
+            chapters = media_info.chapters
         else:
             chapters = [
                 youtube_interfaces.MediaChapter(
@@ -161,15 +161,15 @@ class Transcriber:
                 )
                 for segment in segments:
                     aligned_segment = interfaces.Segment(
-                        start=chapter.start_time + segment.start,
-                        end=chapter.start_time + segment.end,
+                        start_second=chapter.start_time + segment.start_second,
+                        end_second=chapter.start_time + segment.end_second,
                         text=self._fix_comma(
                             segment_text=segment.text, language_code=language_code
                         ),
                     )
                     chapter_segments.append(aligned_segment)
-                    progress_bar.update(aligned_segment.end - current_timestamp)
-                    current_timestamp = aligned_segment.end
+                    progress_bar.update(aligned_segment.end_second - current_timestamp)
+                    current_timestamp = aligned_segment.end_second
 
                 chaptered_transcriptions.append(
                     interfaces.ChapterTranscription(

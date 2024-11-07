@@ -11,12 +11,12 @@ logger = logging.getLogger(__file__)
 class Extractor:
     def __init__(
         self,
-        video_info_extractor: youtube_interfaces.IYtVideoInfoExtractor,
+        media_info_extractor: youtube_interfaces.IYtMediaInfoExtractor,
         transcriber: transcription_interfaces.ITranscriber,
         file_cache: interfaces.IFileCache,
         ignore_source_chapters: bool,
     ) -> None:
-        self.yt_dlp_adapter = video_info_extractor
+        self.yt_dlp_adapter = media_info_extractor
         self.transcriber = transcriber
         self.file_cache = file_cache
         self.ignore_source_chapters = ignore_source_chapters
@@ -28,16 +28,16 @@ class Extractor:
     ) -> interfaces.ChapteredTranscript:
         logger.info(f"Extracting video {video_url} by chapter.")
 
-        video_info = self.yt_dlp_adapter.extract_video_info(video_url=video_url)
+        media_info = self.yt_dlp_adapter.extract_media_info(video_url=video_url)
 
         if self.ignore_source_chapters:
-            video_info.chapters = []
+            media_info.chapters = []
 
         if (
             not skip_cache
             and (
                 cached_chaptered_transcript := self.file_cache.get_chaptered_transcript(
-                    video_id=video_info.video_id
+                    video_id=media_info.video_id
                 )
             )
             is not None
@@ -52,7 +52,7 @@ class Extractor:
         with Timer() as transcribe_timer:
             transcript = self.transcriber.transcribe(
                 audio_path=audio_path,
-                video_info=video_info,
+                media_info=media_info,
             )
             transcripts_by_chapter = [
                 interfaces.TranscriptChapter(
@@ -65,14 +65,16 @@ class Extractor:
 
         chaptered_transcript = interfaces.ChapteredTranscript(
             url=video_url,
-            title=video_info.title,
+            video_id=media_info.video_id,
+            title=media_info.title,
+            webpage_url_domain=media_info.webpage_url_domain,
             chapters=transcripts_by_chapter,
-            chaptered_at_source=len(video_info.chapters) > 0,
+            chaptered_at_source=len(media_info.chapters) > 0,
             language=transcript.language,
         )
 
         self.file_cache.cache_chaptered_transcript(
-            video_id=video_info.video_id,
+            video_id=media_info.video_id,
             transcript=chaptered_transcript,
         )
 

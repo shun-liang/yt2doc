@@ -15,6 +15,7 @@ from yt2doc.extraction.extractor import Extractor
 from yt2doc.formatting.formatter import MarkdownFormatter
 from yt2doc.formatting.llm_topic_segmenter import LLMTopicSegmenter
 from yt2doc.formatting.llm_adapter import LLMAdapter
+from yt2doc.formatting.paragraphs_segmenter import ParagraphsSegmenter
 from yt2doc.yt2doc import Yt2Doc
 
 
@@ -31,6 +32,7 @@ def get_yt2doc(
     sat_model: str,
     segment_unchaptered: bool,
     ignore_source_chapters: bool,
+    to_timestamp_paragraphs: bool,
     llm_model: typing.Optional[str],
     llm_server: str,
     llm_api_key: str,
@@ -43,6 +45,7 @@ def get_yt2doc(
     )
 
     sat = SaT(sat_model)
+    paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
     if segment_unchaptered is True:
         if llm_model is None:
             raise LLMModelNotSpecified(
@@ -57,17 +60,24 @@ def get_yt2doc(
         )
         llm_adapter = LLMAdapter(llm_client=llm_client, llm_model=llm_model)
         llm_topic_segmenter = LLMTopicSegmenter(llm_adapter=llm_adapter)
-        formatter = MarkdownFormatter(sat=sat, topic_segmenter=llm_topic_segmenter)
+        formatter = MarkdownFormatter(
+            paragraphs_segmenter=paragraphs_segmenter,
+            to_timestamp_paragraphs=to_timestamp_paragraphs,
+            topic_segmenter=llm_topic_segmenter,
+        )
     else:
-        formatter = MarkdownFormatter(sat=sat)
+        formatter = MarkdownFormatter(
+            paragraphs_segmenter=paragraphs_segmenter,
+            to_timestamp_paragraphs=to_timestamp_paragraphs,
+        )
 
-    video_info_extractor = MediaInfoExtractor(temp_dir=temp_dir)
+    media_info_extractor = MediaInfoExtractor(temp_dir=temp_dir)
     transcriber = Transcriber(
         temp_dir=temp_dir,
         whisper_adapter=whisper_adapter,
     )
     extractor = Extractor(
-        video_info_extractor=video_info_extractor,
+        media_info_extractor=media_info_extractor,
         transcriber=transcriber,
         file_cache=file_cache,
         ignore_source_chapters=ignore_source_chapters,

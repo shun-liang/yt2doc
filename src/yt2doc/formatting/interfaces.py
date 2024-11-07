@@ -3,11 +3,17 @@ import typing
 from pydantic import BaseModel
 
 from yt2doc.extraction import interfaces as extraction_interfaces
+from yt2doc.transcription import interfaces as transcription_interfaces
+
+
+class Sentence(BaseModel):
+    start_second: float
+    text: str
 
 
 class Chapter(BaseModel):
     title: str
-    text: str
+    paragraphs: typing.Sequence[typing.Sequence[Sentence]]
 
 
 class FormattedTranscript(BaseModel):
@@ -20,10 +26,16 @@ class FormattedPlaylist(BaseModel):
     transcripts: typing.Sequence[FormattedTranscript]
 
 
+class IParagraphsSegmenter(typing.Protocol):
+    def segment(
+        self, transcription_segments: typing.Sequence[transcription_interfaces.Segment]
+    ) -> typing.List[typing.List[Sentence]]: ...
+
+
 class ILLMAdapter(typing.Protocol):
     def get_topic_changing_paragraph_indexes(
         self, paragraphs: typing.List[typing.List[str]]
-    ) -> typing.List[int]: ...
+    ) -> typing.Sequence[int]: ...
 
     def generate_title_for_paragraphs(
         self, paragraphs: typing.List[typing.List[str]]
@@ -32,7 +44,7 @@ class ILLMAdapter(typing.Protocol):
 
 class ITopicSegmenter(typing.Protocol):
     def segment(
-        self, paragraphs: typing.List[typing.List[str]]
+        self, sentences_in_paragraphs: typing.List[typing.List[Sentence]]
     ) -> typing.Sequence[Chapter]: ...
 
 

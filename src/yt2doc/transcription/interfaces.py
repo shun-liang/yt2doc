@@ -8,8 +8,8 @@ from yt2doc.media import interfaces as youtube_interfaces
 
 
 class Segment(BaseModel):
-    start: float
-    end: float
+    start_second: float
+    end_second: float
     text: str
 
 
@@ -33,5 +33,5 @@ class IWhisperAdapter(typing.Protocol):
 
 class ITranscriber(typing.Protocol):
     def transcribe(
-        self, audio_path: Path, video_info: youtube_interfaces.MediaInfo
+        self, audio_path: Path, media_info: youtube_interfaces.MediaInfo
     ) -> Transcription: ...

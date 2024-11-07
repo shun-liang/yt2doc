@@ -10,6 +10,7 @@ from wtpsplit import SaT
 from src.yt2doc.formatting.formatter import MarkdownFormatter
 from src.yt2doc.formatting.llm_topic_segmenter import LLMTopicSegmenter
 from src.yt2doc.formatting.llm_adapter import LLMAdapter
+from src.yt2doc.formatting.paragraphs_segmenter import ParagraphsSegmenter
 from src.yt2doc.extraction.interfaces import ChapteredTranscript, TranscriptChapter
 from src.yt2doc.transcription.interfaces import Segment
 
@@ -26,8 +27,8 @@ def parse_whisper_line(line: str) -> Segment:
     if match:
         start_time, end_time, text = match.groups()
         return Segment(
-            start=time_to_seconds(start_time),
-            end=time_to_seconds(end_time),
+            start_second=time_to_seconds(start_time),
+            end_second=time_to_seconds(end_time),
             text=text,
         )
     assert False, "Line does not match expected whisper segment pattern."
@@ -93,15 +94,24 @@ def test_format_chaptered_transcript_basic(
 ) -> None:
     # Arrange
     sat = SaT("sat-3l")
-    formatter = MarkdownFormatter(sat=sat)
+    paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
+    formatter = MarkdownFormatter(
+        paragraphs_segmenter=paragraphs_segmenter, to_timestamp_paragraphs=False
+    )
 
     segments_dicts = [
-        {"start": segment.start, "end": segment.end, "text": segment.text}
+        {
+            "start_second": segment.start_second,
+            "end_second": segment.end_second,
+            "text": segment.text,
+        }
         for segment in mock_transcript_segments
     ]
 
     test_transcript = ChapteredTranscript(
         url="https://example.com/video",
+        webpage_url_domain="example.com",
+        video_id="video",
         title="Test Video Title",
         language="en",
         chaptered_at_source=True,
@@ -127,6 +137,8 @@ def test_format_chaptered_transcript_basic(
         "Hi class. So today I'll be talking about climate change"
         in formatted_output.transcript
     )
+    assert formatted_output.transcript.count("\n\n") > 6
+    assert "(0:00:00)" not in formatted_output.transcript
 
 
 def test_markdown_formatter_with_segmentation(
@@ -154,17 +166,28 @@ def test_markdown_formatter_with_segmentation(
     )
 
     sat = SaT("sat-3l")
+    paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
     segmenter = LLMTopicSegmenter(llm_adapter=mock_llm_adapter)
-    formatter = MarkdownFormatter(sat=sat, topic_segmenter=segmenter)
+    formatter = MarkdownFormatter(
+        paragraphs_segmenter=paragraphs_segmenter,
+        to_timestamp_paragraphs=False,
+        topic_segmenter=segmenter,
+    )
 
     segments_dicts = [
-        {"start": segment.start, "end": segment.end, "text": segment.text}
+        {
+            "start_second": segment.start_second,
+            "end_second": segment.end_second,
+            "text": segment.text,
+        }
         for segment in mock_transcript_segments
     ]
 
     test_transcript = ChapteredTranscript(
         url="https://example.com/video",
         title="Test Video Title",
+        webpage_url_domain="example.com",
+        video_id="video",
         language="en",
         chaptered_at_source=False,
         chapters=[
@@ -183,4 +206,49 @@ def test_markdown_formatter_with_segmentation(
     # Assert
     assert "# Test Video Title" in formatted_output.transcript
     assert "## Chapter Title" in formatted_output.transcript
-    # mock_llm_client.chat.completions.create.assert_called_once()
+    assert formatted_output.transcript.count("\n\n") > 6
+    assert "(0:00:00)" not in formatted_output.transcript
+
+
+def test_format_chaptered_transcript_timestamp_paragraphs(
+    mock_transcript_segments: typing.List[Segment],
+) -> None:
+    # Arrange
+    sat = SaT("sat-3l")
+    paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
+    formatter = MarkdownFormatter(
+        paragraphs_segmenter=paragraphs_segmenter, to_timestamp_paragraphs=True
+    )
+
+    segments_dicts = [
+        {
+            "start_second": segment.start_second,
+            "end_second": segment.end_second,
+            "text": segment.text,
+        }
+        for segment in mock_transcript_segments
+    ]
+
+    test_transcript = ChapteredTranscript(
+        url="https://example.com/video",
+        webpage_url_domain="example.com",
+        video_id="video",
+        title="Test Video Title",
+        language="en",
+        chaptered_at_source=True,
+        chapters=[
+            TranscriptChapter(
+                title="Chapter 1",
+                segments=segments_dicts,
+            ),
+        ],
+    )
+
+    # Act
+    formatted_output = formatter.format_chaptered_transcript(
+        chaptered_transcript=test_transcript
+    )
+
+    # Assert
+    assert formatted_output.title == "Test Video Title"
+    assert "(0:00:00)" in formatted_output.transcript
