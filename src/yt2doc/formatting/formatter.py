@@ -3,10 +3,19 @@ import logging
 
 from datetime import timedelta
 
+from pydantic import BaseModel
+
 from yt2doc.extraction import interfaces as extraction_interfaces
 from yt2doc.formatting import interfaces
 
 logger = logging.getLogger(__file__)
+
+
+class ChapterToRender(BaseModel):
+    title: str
+    custom_id: str
+    start_second: float
+    full_text: str
 
 
 class MarkdownFormatter:
@@ -14,6 +23,7 @@ class MarkdownFormatter:
         self,
         paragraphs_segmenter: interfaces.IParagraphsSegmenter,
         to_timestamp_paragraphs: bool,
+        add_table_of_contents: bool,
         topic_segmenter: typing.Optional[interfaces.ITopicSegmenter] = None,
     ) -> None:
         self.paragraphs_segmenter = paragraphs_segmenter
@@ -21,6 +31,7 @@ class MarkdownFormatter:
         self.video_title_template = "# {name}"
         self.chapter_title_template = "## {name}"
         self.to_timestamp_paragraphs = to_timestamp_paragraphs
+        self.add_table_of_contents = add_table_of_contents
 
     @staticmethod
     def _paragraphs_to_text(
@@ -44,6 +55,24 @@ class MarkdownFormatter:
                 paragraph_text = f"{timestamp_prefix} {paragraph_text}"
             paragraph_texts.append(paragraph_text)
         return "\n\n".join(paragraph_texts)
+
+    @staticmethod
+    def _get_table_of_contents(
+        chapters: typing.Sequence[ChapterToRender],
+        video_id: str,
+        webpage_url_domain: str,
+    ) -> str:
+        chapter_links = []
+        for chapter in chapters:
+            chapter_start_second = round(chapter.start_second)
+            chapter_start_h_m_s = str(timedelta(seconds=chapter_start_second))
+            if webpage_url_domain == "youtube.com":
+                timestamp_prefix = f"[({chapter_start_h_m_s})](https://youtu.be/{video_id}?t={chapter_start_second})"
+            else:
+                timestamp_prefix = f"({chapter_start_h_m_s})"
+            chapter_link = f"{timestamp_prefix} {chapter.title}"
+            chapter_links.append(chapter_link)
+        table_of_content_text = f"### Table of Contents\n\n{"\n".join(chapter_links)}"
 
     def format_chaptered_transcript(
         self, chaptered_transcript: extraction_interfaces.ChapteredTranscript
@@ -86,7 +115,7 @@ class MarkdownFormatter:
                     webpage_url_domain=chaptered_transcript.webpage_url_domain,
                     to_timestamp_paragraphs=self.to_timestamp_paragraphs,
                 )
-                chapter_and_text_list.append((chapter.title, chapter_full_text.strip()))
+                chapter_and_text_list.append((chapter.title, chapter_full_text))
 
         transcript_text = "\n\n".join(
             [
