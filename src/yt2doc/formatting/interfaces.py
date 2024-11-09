@@ -18,7 +18,7 @@ class Chapter(BaseModel):
 
 class FormattedTranscript(BaseModel):
     title: str
-    transcript: str
+    rendered_transcript: str
 
 
 class FormattedPlaylist(BaseModel):

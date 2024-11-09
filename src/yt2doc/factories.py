@@ -33,6 +33,7 @@ def get_yt2doc(
     segment_unchaptered: bool,
     ignore_source_chapters: bool,
     to_timestamp_paragraphs: bool,
+    add_table_of_contents: bool,
     llm_model: typing.Optional[str],
     llm_server: str,
     llm_api_key: str,
@@ -63,12 +64,14 @@ def get_yt2doc(
         formatter = MarkdownFormatter(
             paragraphs_segmenter=paragraphs_segmenter,
             to_timestamp_paragraphs=to_timestamp_paragraphs,
+            add_table_of_contents=add_table_of_contents,
             topic_segmenter=llm_topic_segmenter,
         )
     else:
         formatter = MarkdownFormatter(
             paragraphs_segmenter=paragraphs_segmenter,
             to_timestamp_paragraphs=to_timestamp_paragraphs,
+            add_table_of_contents=add_table_of_contents,
         )
 
     media_info_extractor = MediaInfoExtractor(temp_dir=temp_dir)
