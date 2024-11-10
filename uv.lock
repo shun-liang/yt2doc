@@ -1585,6 +1585,18 @@ wheels = [
 ]
 
 [[package]]
+name = "python-slugify"
+version = "8.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "text-unidecode" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/87/c7/5e1547c44e31da50a460df93af11a535ace568ef89d7a811069ead340c4a/python-slugify-8.0.4.tar.gz", hash = "sha256:59202371d1d05b54a9e7720c5e038f928f45daaffe41dd10822f3907b937c856", size = 10921 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/62/02da182e544a51a5c3ccf4b03ab79df279f9c60c5e82d5e8bec7ca26ac11/python_slugify-8.0.4-py2.py3-none-any.whl", hash = "sha256:276540b79961052b66b7d116620b36518847f52d5fd9e3a70164fc8c50faa6b8", size = 10051 },
+]
+
+[[package]]
 name = "pytz"
 version = "2024.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1944,6 +1956,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/cd/94/91fccdb4b8110642462e653d5dcb27e7b674742ad68efd146367da7bdb10/tenacity-9.0.0.tar.gz", hash = "sha256:807f37ca97d62aa361264d497b0e31e92b8027044942bfa756160d908320d73b", size = 47421 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b6/cb/b86984bed139586d01532a587464b5805f12e397594f19f931c4c2fbfa61/tenacity-9.0.0-py3-none-any.whl", hash = "sha256:93de0c98785b27fcf659856aa9f54bfbd399e29969b0621bc7f762bd441b4539", size = 28169 },
+]
+
+[[package]]
+name = "text-unidecode"
+version = "1.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ab/e2/e9a00f0ccb71718418230718b3d900e71a5d16e701a3dae079a21e9cd8f8/text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93", size = 76885 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a6/a5/c0b6468d3824fe3fde30dbb5e1f687b291608f9473681bbf7dabbf5a87d7/text_unidecode-1.3-py2.py3-none-any.whl", hash = "sha256:1311f10e8b895935241623731c2ba64f4c455287888b18189350b67134a822e8", size = 78154 },
 ]
 
 [[package]]
@@ -2351,16 +2372,18 @@ wheels = [
 
 [[package]]
 name = "yt2doc"
-version = "0.2.10.dev7+g3c7615a.d20241102"
+version = "0.3.1.dev2+gf717967.d20241109"
 source = { editable = "." }
 dependencies = [
     { name = "emoji" },
     { name = "faster-whisper" },
     { name = "ffmpeg-python" },
     { name = "instructor" },
+    { name = "jinja2" },
     { name = "openai" },
     { name = "pathvalidate" },
     { name = "pydantic" },
+    { name = "python-slugify" },
     { name = "torch" },
     { name = "tqdm" },
     { name = "typer-slim" },
@@ -2383,9 +2406,11 @@ requires-dist = [
     { name = "faster-whisper", specifier = ">=1.0.3" },
     { name = "ffmpeg-python", specifier = ">=0.2.0" },
     { name = "instructor", specifier = ">=1.5.1" },
+    { name = "jinja2", specifier = ">=3.1.4" },
     { name = "openai", specifier = ">=1.51.0" },
     { name = "pathvalidate", specifier = ">=3.2.1" },
     { name = "pydantic", specifier = ">=2.9.1" },
+    { name = "python-slugify", specifier = ">=8.0.4" },
     { name = "torch", specifier = ">=2.4.1" },
     { name = "tqdm", specifier = ">=4.66.5" },
     { name = "typer-slim", specifier = ">=0.12.5" },

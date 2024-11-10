@@ -1,7 +1,11 @@
+import logging
 import typing
 
 from instructor import Instructor
+from instructor.exceptions import InstructorRetryException
 from pydantic import BaseModel, AfterValidator
+
+logger = logging.getLogger(__name__)
 
 
 class LLMAdapter:
@@ -36,65 +40,77 @@ class LLMAdapter:
                 typing.List[int], AfterValidator(validate_paragraph_indexes)
             ]
 
-        result = self.llm_client.chat.completions.create(
-            model=self.llm_model,
-            response_model=Result,
-            messages=[
-                {
-                    "role": "system",
-                    "content": """
-                        You are a smart assistant who reads paragraphs of text from an audio transcript and
-                        find the paragraphs that significantly change topic from the previous paragraph.
+        try:
+            result = self.llm_client.chat.completions.create(
+                model=self.llm_model,
+                response_model=Result,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": """
+                            You are a smart assistant who reads paragraphs of text from an audio transcript and
+                            find the paragraphs that significantly change topic from the previous paragraph.
 
-                        Make sure only mark paragraphs that talks about a VERY DIFFERENT topic from the previous one.
+                            Make sure only mark paragraphs that talks about a VERY DIFFERENT topic from the previous one.
 
-                        The response should be an array of the index number of such paragraphs, such as `[1, 3, 5]`
+                            The response should be an array of the index number of such paragraphs, such as `[1, 3, 5]`
 
-                        If there is no paragraph that changes topic, then return an empty list.
+                            If there is no paragraph that changes topic, then return an empty list.
+                            """,
+                    },
+                    {
+                        "role": "user",
+                        "content": """
+                            {% for paragraph in paragraphs %}
+                            <paragraph {{ loop.index0 }}>
+                            {{ paragraph }}
+                            </ paragraph {{ loop.index0 }}>
+                            {% endfor %}
                         """,
+                    },
+                ],
+                context={
+                    "paragraphs": paragraph_texts,
                 },
-                {
-                    "role": "user",
-                    "content": """
-                        {% for paragraph in paragraphs %}
-                        <paragraph {{ loop.index0 }}>
-                        {{ paragraph }}
-                        </ paragraph {{ loop.index0 }}>
-                        {% endfor %}
-                    """,
-                },
-            ],
-            context={
-                "paragraphs": paragraph_texts,
-            },
-        )
+            )
+        except InstructorRetryException as e:
+            logger.warning(
+                f"Failed to get topic changing paragraph from the LLM. Exception: {e}"
+            )
+            return []
         return result.paragraph_indexes
 
     def generate_title_for_paragraphs(
         self, paragraphs: typing.List[typing.List[str]]
     ) -> str:
         text = "\n\n".join(["".join(p) for p in paragraphs])
-        title = self.llm_client.chat.completions.create(
-            model=self.llm_model,
-            response_model=str,
-            messages=[
-                {
-                    "role": "system",
-                    "content": """
-                        Please generate a short title for the following text.
+        try:
+            title = self.llm_client.chat.completions.create(
+                model=self.llm_model,
+                response_model=str,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": """
+                            Please generate a short title for the following text.
 
-                        Be VERY SUCCINCT. No more than 6 words.
-                    """,
+                            Be VERY SUCCINCT. No more than 6 words.
+                        """,
+                    },
+                    {
+                        "role": "user",
+                        "content": """
+                            {{ text }}
+                        """,
+                    },
+                ],
+                context={
+                    "text": text,
                 },
-                {
-                    "role": "user",
-                    "content": """
-                        {{ text }}
-                    """,
-                },
-            ],
-            context={
-                "text": text,
-            },
-        )
+            )
+        except InstructorRetryException as e:
+            logger.warning(
+                f"Failed to title for topic segment from the LLM. Exception: {e}"
+            )
+            return "Failed to generate title"
         return title

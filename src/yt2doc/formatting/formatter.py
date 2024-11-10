@@ -1,7 +1,13 @@
 import typing
 import logging
 
+import jinja2
+
 from datetime import timedelta
+from pathlib import Path
+
+from pydantic import BaseModel
+from slugify import slugify
 
 from yt2doc.extraction import interfaces as extraction_interfaces
 from yt2doc.formatting import interfaces
@@ -9,11 +15,24 @@ from yt2doc.formatting import interfaces
 logger = logging.getLogger(__file__)
 
 
+class ParagraphToRender(BaseModel):
+    start_h_m_s: str
+    text: str
+
+
+class ChapterToRender(BaseModel):
+    title: str
+    custom_id: str
+    start_h_m_s: str
+    paragraphs: typing.Sequence[ParagraphToRender]
+
+
 class MarkdownFormatter:
     def __init__(
         self,
         paragraphs_segmenter: interfaces.IParagraphsSegmenter,
         to_timestamp_paragraphs: bool,
+        add_table_of_contents: bool,
         topic_segmenter: typing.Optional[interfaces.ITopicSegmenter] = None,
     ) -> None:
         self.paragraphs_segmenter = paragraphs_segmenter
@@ -21,35 +40,71 @@ class MarkdownFormatter:
         self.video_title_template = "# {name}"
         self.chapter_title_template = "## {name}"
         self.to_timestamp_paragraphs = to_timestamp_paragraphs
+        self.add_table_of_contents = add_table_of_contents
 
     @staticmethod
-    def _paragraphs_to_text(
-        paragraphs: typing.Sequence[typing.Sequence[interfaces.Sentence]],
+    def _start_second_to_start_h_m_s(
+        start_second: float, webpage_url_domain: str, video_id: str
+    ) -> str:
+        rounded_start_second = round(start_second)
+        start_h_m_s = str(timedelta(seconds=rounded_start_second))
+        if webpage_url_domain == "youtube.com":
+            return (
+                f"[{start_h_m_s}](https://youtu.be/{video_id}?t={rounded_start_second})"
+            )
+        return start_h_m_s
+
+    def _render(
+        self,
+        title: str,
+        chapters: typing.Sequence[interfaces.Chapter],
+        video_url: str,
         video_id: str,
         webpage_url_domain: str,
-        to_timestamp_paragraphs: bool,
     ) -> str:
-        paragraph_texts = []
-        for paragraph in paragraphs:
-            first_sentence = paragraph[0]
-            paragraph_text = "".join(sentence.text for sentence in paragraph)
-            paragraph_text = paragraph_text.strip()
-            if to_timestamp_paragraphs:
-                paragraph_start_second = round(first_sentence.start_second)
-                paragraph_start_h_m_s = str(timedelta(seconds=paragraph_start_second))
-                if webpage_url_domain == "youtube.com":
-                    timestamp_prefix = f"[({paragraph_start_h_m_s})](https://youtu.be/{video_id}?t={paragraph_start_second})"
-                else:
-                    timestamp_prefix = f"({paragraph_start_h_m_s})"
-                paragraph_text = f"{timestamp_prefix} {paragraph_text}"
-            paragraph_texts.append(paragraph_text)
-        return "\n\n".join(paragraph_texts)
+        chapters_to_render: typing.List[ChapterToRender] = []
+        for chapter in chapters:
+            if len(chapter.paragraphs) == 0:
+                continue
+
+            paragraphs_to_render = [
+                ParagraphToRender(
+                    text=("".join([sentence.text for sentence in paragraph])).strip(),
+                    start_h_m_s=self._start_second_to_start_h_m_s(
+                        start_second=paragraph[0].start_second,
+                        webpage_url_domain=webpage_url_domain,
+                        video_id=video_id,
+                    ),
+                )
+                for paragraph in chapter.paragraphs
+            ]
+            first_paragraph_to_render = paragraphs_to_render[0]
+            chapters_to_render.append(
+                ChapterToRender(
+                    title=chapter.title,
+                    custom_id=slugify(chapter.title),
+                    start_h_m_s=first_paragraph_to_render.start_h_m_s,
+                    paragraphs=paragraphs_to_render,
+                )
+            )
+
+        current_dir = Path(__file__).parent
+        jinja_environment = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(current_dir)
+        )
+        template = jinja_environment.get_template("template.md")
+        rendered = template.render(
+            title=title,
+            chapters=[chapter.model_dump() for chapter in chapters_to_render],
+            video_url=video_url,
+            add_table_of_contents=self.add_table_of_contents,
+            to_timestamp_paragraphs=self.to_timestamp_paragraphs,
+        )
+        return rendered
 
     def format_chaptered_transcript(
         self, chaptered_transcript: extraction_interfaces.ChapteredTranscript
     ) -> interfaces.FormattedTranscript:
-        chapter_and_text_list: typing.List[typing.Tuple[str, str]] = []
-
         if (
             self.topic_segmenter is not None
             and not chaptered_transcript.chaptered_at_source
@@ -62,42 +117,27 @@ class MarkdownFormatter:
             chapters = self.topic_segmenter.segment(
                 sentences_in_paragraphs=paragraphed_sentences
             )
-            chapter_and_text_list = [
-                (
-                    chapter.title,
-                    self._paragraphs_to_text(
-                        paragraphs=chapter.paragraphs,
-                        video_id=chaptered_transcript.video_id,
-                        webpage_url_domain=chaptered_transcript.webpage_url_domain,
-                        to_timestamp_paragraphs=self.to_timestamp_paragraphs,
-                    ),
-                )
-                for chapter in chapters
-            ]
 
         else:
-            for chapter in chaptered_transcript.chapters:
-                paragraphed_sentences = self.paragraphs_segmenter.segment(
-                    transcription_segments=chapter.segments
+            chapters = [
+                interfaces.Chapter(
+                    title=chapter.title,
+                    paragraphs=self.paragraphs_segmenter.segment(chapter.segments),
                 )
-                chapter_full_text = self._paragraphs_to_text(
-                    paragraphs=paragraphed_sentences,
-                    video_id=chaptered_transcript.video_id,
-                    webpage_url_domain=chaptered_transcript.webpage_url_domain,
-                    to_timestamp_paragraphs=self.to_timestamp_paragraphs,
-                )
-                chapter_and_text_list.append((chapter.title, chapter_full_text.strip()))
-
-        transcript_text = "\n\n".join(
-            [
-                f"{self.chapter_title_template.format(name=chapter_title)}\n\n{chapter_text}"
-                for chapter_title, chapter_text in chapter_and_text_list
+                for chapter in chaptered_transcript.chapters
             ]
+
+        rendered_transcript = self._render(
+            title=chaptered_transcript.title,
+            chapters=chapters,
+            video_url=chaptered_transcript.url,
+            video_id=chaptered_transcript.video_id,
+            webpage_url_domain=chaptered_transcript.webpage_url_domain,
         )
-        transcript_text = f"{self.video_title_template.format(name=chaptered_transcript.title)}\n\n{chaptered_transcript.url}\n\n{transcript_text}"
+
         return interfaces.FormattedTranscript(
             title=chaptered_transcript.title,
-            transcript=transcript_text,
+            rendered_transcript=rendered_transcript,
         )
 
     def format_chaptered_playlist_transcripts(

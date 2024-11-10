@@ -96,7 +96,9 @@ def test_format_chaptered_transcript_basic(
     sat = SaT("sat-3l")
     paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
     formatter = MarkdownFormatter(
-        paragraphs_segmenter=paragraphs_segmenter, to_timestamp_paragraphs=False
+        paragraphs_segmenter=paragraphs_segmenter,
+        to_timestamp_paragraphs=False,
+        add_table_of_contents=False,
     )
 
     segments_dicts = [
@@ -130,15 +132,15 @@ def test_format_chaptered_transcript_basic(
 
     # Assert
     assert formatted_output.title == "Test Video Title"
-    assert "# Test Video Title" in formatted_output.transcript
-    assert "https://example.com/video" in formatted_output.transcript
-    assert "## Chapter 1" in formatted_output.transcript
+    assert "# Test Video Title" in formatted_output.rendered_transcript
+    assert "https://example.com/video" in formatted_output.rendered_transcript
+    assert "## Chapter 1" in formatted_output.rendered_transcript
     assert (
         "Hi class. So today I'll be talking about climate change"
-        in formatted_output.transcript
+        in formatted_output.rendered_transcript
     )
-    assert formatted_output.transcript.count("\n\n") > 6
-    assert "(0:00:00)" not in formatted_output.transcript
+    assert formatted_output.rendered_transcript.count("\n\n") > 6
+    assert "(0:00:00)" not in formatted_output.rendered_transcript
 
 
 def test_markdown_formatter_with_segmentation(
@@ -171,6 +173,7 @@ def test_markdown_formatter_with_segmentation(
     formatter = MarkdownFormatter(
         paragraphs_segmenter=paragraphs_segmenter,
         to_timestamp_paragraphs=False,
+        add_table_of_contents=False,
         topic_segmenter=segmenter,
     )
 
@@ -204,10 +207,10 @@ def test_markdown_formatter_with_segmentation(
     )
 
     # Assert
-    assert "# Test Video Title" in formatted_output.transcript
-    assert "## Chapter Title" in formatted_output.transcript
-    assert formatted_output.transcript.count("\n\n") > 6
-    assert "(0:00:00)" not in formatted_output.transcript
+    assert "# Test Video Title" in formatted_output.rendered_transcript
+    assert "## Chapter Title" in formatted_output.rendered_transcript
+    assert formatted_output.rendered_transcript.count("\n\n") > 6
+    assert "(0:00:00)" not in formatted_output.rendered_transcript
 
 
 def test_format_chaptered_transcript_timestamp_paragraphs(
@@ -217,7 +220,9 @@ def test_format_chaptered_transcript_timestamp_paragraphs(
     sat = SaT("sat-3l")
     paragraphs_segmenter = ParagraphsSegmenter(sat=sat)
     formatter = MarkdownFormatter(
-        paragraphs_segmenter=paragraphs_segmenter, to_timestamp_paragraphs=True
+        paragraphs_segmenter=paragraphs_segmenter,
+        to_timestamp_paragraphs=True,
+        add_table_of_contents=False,
     )
 
     segments_dicts = [
@@ -251,4 +256,4 @@ def test_format_chaptered_transcript_timestamp_paragraphs(
 
     # Assert
     assert formatted_output.title == "Test Video Title"
-    assert "(0:00:00)" in formatted_output.transcript
+    assert "(0:00:00)" in formatted_output.rendered_transcript

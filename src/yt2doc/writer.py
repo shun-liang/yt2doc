@@ -23,7 +23,7 @@ class IOWriter:
         formatted_transcript: formatting_interfaces.FormattedTranscript,
     ) -> None:
         if output_target is None or output_target == "-":
-            print(formatted_transcript.transcript + "\n")
+            print(formatted_transcript.rendered_transcript + "\n")
             return
 
         output_path = Path(output_target)
@@ -40,7 +40,7 @@ class IOWriter:
             file_path = output_path
 
         with open(file_path, "w+") as f:
-            f.write(formatted_transcript.transcript)
+            f.write(formatted_transcript.rendered_transcript)
 
     def write_playlist(
         self,
@@ -52,7 +52,7 @@ class IOWriter:
             print(
                 "\n\n".join(
                     [
-                        transcript.transcript
+                        transcript.rendered_transcript
                         for transcript in formatted_playlist.transcripts
                     ]
                 )
@@ -69,13 +69,13 @@ class IOWriter:
                     output_dir=output_path, title=transcript.title
                 )
                 with open(file_path, "w+") as f:
-                    f.write(transcript.transcript)
+                    f.write(transcript.rendered_transcript)
         else:
             with open(output_path, "w+") as f:
                 f.write(
                     "\n\n".join(
                         [
-                            transcript.transcript
+                            transcript.rendered_transcript
                             for transcript in formatted_playlist.transcripts
                         ]
                     )

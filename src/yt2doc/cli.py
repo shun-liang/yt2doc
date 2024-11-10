@@ -79,6 +79,11 @@ def main(
         "--timestamp-paragraphs",
         help="Prepend timestamp to paragraphs",
     ),
+    add_table_of_contents: bool = typer.Option(
+        False,
+        "--add-table-of-contents",
+        help="Add table of contents at the beginning of the document",
+    ),
     skip_cache: typing.Annotated[
         bool,
         typer.Option("--skip-cache", help="If should skip reading from cache"),
@@ -151,6 +156,7 @@ def main(
             segment_unchaptered=segment_unchaptered,
             ignore_source_chapters=ignore_source_chapters,
             to_timestamp_paragraphs=to_timestamp_paragraphs,
+            add_table_of_contents=add_table_of_contents,
             llm_model=llm_model,
             llm_server=llm_server,
             llm_api_key=llm_api_key,
