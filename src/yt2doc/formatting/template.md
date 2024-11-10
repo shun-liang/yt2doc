@@ -10,7 +10,7 @@
 {%- endif %}
 {%- for chapter in chapters %}
 
-## {{ chapter.title }}{% for paragraph in chapter.paragraphs %}
+## {{ chapter.title }}{%if add_table_of_contents %}<a name="{{chapter.custom_id}}"></a>{% endif %}{% for paragraph in chapter.paragraphs %}
 
 {% if to_timestamp_paragraphs %}({{ paragraph.start_h_m_s }}) {% endif %}{{ paragraph.text }}
 {%- endfor %}
