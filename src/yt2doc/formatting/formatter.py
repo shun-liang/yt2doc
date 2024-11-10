@@ -47,9 +47,11 @@ class MarkdownFormatter:
         start_second: float, webpage_url_domain: str, video_id: str
     ) -> str:
         rounded_start_second = round(start_second)
-        start_h_m_s = str(timedelta(rounded_start_second))
+        start_h_m_s = str(timedelta(seconds=rounded_start_second))
         if webpage_url_domain == "youtube.com":
-            return f"[{start_h_m_s}](https://youtu.be/{video_id}?t={start_second})"
+            return (
+                f"[{start_h_m_s}](https://youtu.be/{video_id}?t={rounded_start_second})"
+            )
         return start_h_m_s
 
     def _render(
@@ -67,7 +69,7 @@ class MarkdownFormatter:
 
             paragraphs_to_render = [
                 ParagraphToRender(
-                    text="".join([sentence.text for sentence in paragraph]),
+                    text=("".join([sentence.text for sentence in paragraph])).strip(),
                     start_h_m_s=self._start_second_to_start_h_m_s(
                         start_second=paragraph[0].start_second,
                         webpage_url_domain=webpage_url_domain,
