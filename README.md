@@ -53,6 +53,16 @@ Or install with [uv](https://github.com/astral-sh/uv):
 uv tool install yt2doc
 ```
 
+#### ⚠️ Know issue of Python 3.13 on MacOS
+
+If you are on MacOS and running Python 3.13, you may face a dependency issue that is from the upstream PyTorch dependency. See issue [#46](https://github.com/shun-liang/yt2doc/issues/46).
+
+A quick workaround will be
+
+```
+pipx install --python 3.12 yt2doc
+```
+
 ### Upgrade
 
 If you have already installed yt2doc but would like to upgrade to a later version:
@@ -156,6 +166,13 @@ List of available SaT models [here](https://github.com/segment-any-text/wtpsplit
 Paragraphs in the generated Markdown can be timestamped by
 ```
 yt2doc --video <video-url> --timestamp-paragraphs
+```
+
+### Add table of contents
+
+A table of contents of all chapters can be added by
+```
+yt2doc --video <video-url>  --segment-unchaptered --llm-model <llm-model> --add-table-of-contents
 ```
 
 ### Ignore chapters from source
