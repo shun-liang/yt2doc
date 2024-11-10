@@ -6,6 +6,7 @@ import typer
 
 from enum import Enum
 from pathlib import Path
+from importlib.metadata import version
 
 import faster_whisper
 
@@ -102,7 +103,18 @@ def main(
             help="Ignore original chapters from the source",
         ),
     ] = False,
+    show_version: typing.Annotated[
+        bool,
+        typer.Option(
+            "--version",
+            help="Show the current version of yt2doc",
+        ),
+    ] = False,
 ) -> None:
+    if show_version:
+        typer.echo(version("yt2doc"))
+        return
+
     io_writer = IOWriter()
 
     whisper_adapter: IWhisperAdapter
