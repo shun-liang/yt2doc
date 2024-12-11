@@ -64,13 +64,15 @@ def _merge_short_chapters(
     return merged_chapters
 
 
-class MediaInfoExtractor:
-    def __init__(self, temp_dir: Path):
+class YtDlpMediaInfoExtractor:
+    def __init__(self, temp_dir: Path, extra_opts: typing.Dict[str, typing.Any]):
         self.temp_dir = temp_dir
+        self.extra_opts = extra_opts
 
     def extract_media_info(self, video_url: str) -> interfaces.MediaInfo:
         ydl_opts = {
             "quiet": True,
+            **self.extra_opts,
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -99,6 +101,7 @@ class MediaInfoExtractor:
                     "preferredcodec": "m4a",
                 }
             ],
+            **self.extra_opts,
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             response = ydl.extract_info(video_url, download=True)

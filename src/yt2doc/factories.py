@@ -6,7 +6,7 @@ import instructor
 from wtpsplit import SaT
 from openai import OpenAI
 
-from yt2doc.media.media_info_extractor import MediaInfoExtractor
+from yt2doc.media.media_info_extractor import YtDlpMediaInfoExtractor
 from yt2doc.transcription.transcriber import Transcriber
 from yt2doc.transcription import interfaces as transcription_interfaces
 from yt2doc.extraction.file_cache import FileCache
@@ -38,6 +38,7 @@ def get_yt2doc(
     llm_server: str,
     llm_api_key: str,
     temp_dir: Path,
+    yt_dlp_options: typing.Dict[str, typing.Any],
 ) -> Yt2Doc:
     DEFAULT_CACHE_PATH.mkdir(exist_ok=True)
     file_cache = FileCache(
@@ -74,7 +75,10 @@ def get_yt2doc(
             add_table_of_contents=add_table_of_contents,
         )
 
-    media_info_extractor = MediaInfoExtractor(temp_dir=temp_dir)
+    media_info_extractor = YtDlpMediaInfoExtractor(
+        temp_dir=temp_dir,
+        extra_opts=yt_dlp_options or {},
+    )
     transcriber = Transcriber(
         temp_dir=temp_dir,
         whisper_adapter=whisper_adapter,

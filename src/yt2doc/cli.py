@@ -1,3 +1,4 @@
+import ast
 import tempfile
 import typing
 import logging
@@ -23,9 +24,19 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__file__)
 
 
+class MalformedYtDlpOpts(Exception):
+    pass
+
+
 class WhisperBackend(str, Enum):
     faster_whisper = "faster_whisper"
     whisper_cpp = "whisper_cpp"
+
+
+def _is_dict_of_str_any(
+    value: typing.Any,
+) -> typing.TypeGuard[typing.Dict[str, typing.Any]]:
+    return isinstance(value, dict) and all(isinstance(key, str) for key in value)
 
 
 def main(
@@ -103,6 +114,11 @@ def main(
             help="Ignore original chapters from the source",
         ),
     ] = False,
+    yt_dlp_extra_opts_str: typing.Optional[str] = typer.Option(
+        None,
+        "--yt-dlp-extra-opts",
+        help="Extra opts to yt-dlp as a string representation of a dictionary",
+    ),
     show_version: typing.Annotated[
         bool,
         typer.Option(
@@ -159,6 +175,21 @@ def main(
             "whisper_cpp_model": whisper_cpp_model.resolve().as_posix(),
         }
 
+    if yt_dlp_extra_opts_str is None:
+        yt_dlp_extra_opts = {}
+    else:
+        try:
+            yt_dlp_extra_opts = ast.literal_eval(yt_dlp_extra_opts_str)
+        except ValueError as e:
+            raise MalformedYtDlpOpts(
+                f"ValueError when trying to parse yt-dlp-extra-opts: f{e}"
+            )
+
+    if not _is_dict_of_str_any(yt_dlp_extra_opts):
+        raise MalformedYtDlpOpts(
+            "yt-dlp-extra-opts is not a string representation of a dictionary"
+        )
+
     with tempfile.TemporaryDirectory() as temp_dir_name:
         temp_dir = Path(temp_dir_name)
         yt2doc = get_yt2doc(
@@ -173,6 +204,7 @@ def main(
             llm_server=llm_server,
             llm_api_key=llm_api_key,
             temp_dir=temp_dir,
+            yt_dlp_options=yt_dlp_extra_opts,
         )
 
         if video_url:
