@@ -114,6 +114,7 @@ class YtDlpMediaInfoExtractor:
         ydl_opts = {
             "extract_flat": "in_playlist",
             "quiet": True,
+            **self.extra_opts,
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
