@@ -183,6 +183,17 @@ Sometimes, the chaptering of the video/audio at the source does not segment the 
 yt2doc --video <video-url> --ignore-chapters --segment-unchaptered --llm-model <model-name>
 ```
 
+### Extra options to yt-dlp
+
+If you need to specify extra options to yt-dlp, you can specify `--yt-dlp-extra-opts` with a string representation of a Python dictionary of the key and value pairs, such as
+
+```
+yt2doc --video <video-url> --yt-dlp-extra-opts '{"quiet": False}'
+```
+
+The list of possible keys supported by yt-dlp (as a library, not as a cli tool) is documented in the source code and may change any time. As of version [2024.12.06](https://github.com/yt-dlp/yt-dlp/releases/tag/2024.12.06) the yt-dlp options are documented [here](https://github.com/yt-dlp/yt-dlp/blob/2024.12.06/yt_dlp/YoutubeDL.py#L212-L491).
+
+
 ### Run in Docker
 
 To run yt2doc in Docker, first pull the image from ghcr:
