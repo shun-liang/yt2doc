@@ -182,12 +182,12 @@ def main(
             yt_dlp_extra_opts = ast.literal_eval(yt_dlp_extra_opts_str)
         except ValueError as e:
             raise MalformedYtDlpOpts(
-                f"ValueError when trying to parse yt-dlp-extra-opts: f{e}"
+                f"ValueError when trying to parse --yt-dlp-extra-opts: f{e}"
             )
 
     if not _is_dict_of_str_any(yt_dlp_extra_opts):
         raise MalformedYtDlpOpts(
-            "yt-dlp-extra-opts is not a string representation of a dictionary"
+            "--yt-dlp-extra-opts is not a string representation of a dictionary"
         )
 
     with tempfile.TemporaryDirectory() as temp_dir_name:

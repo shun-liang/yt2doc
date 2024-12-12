@@ -6,7 +6,7 @@ import instructor
 from wtpsplit import SaT
 from openai import OpenAI
 
-from yt2doc.media.media_info_extractor import YtDlpMediaInfoExtractor
+from yt2doc.media.media_info_extractor import YtDLPMediaInfoExtractor
 from yt2doc.transcription.transcriber import Transcriber
 from yt2doc.transcription import interfaces as transcription_interfaces
 from yt2doc.extraction.file_cache import FileCache
@@ -75,7 +75,7 @@ def get_yt2doc(
             add_table_of_contents=add_table_of_contents,
         )
 
-    media_info_extractor = YtDlpMediaInfoExtractor(
+    media_info_extractor = YtDLPMediaInfoExtractor(
         temp_dir=temp_dir,
         extra_opts=yt_dlp_options or {},
     )

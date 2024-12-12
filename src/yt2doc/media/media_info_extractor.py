@@ -64,7 +64,7 @@ def _merge_short_chapters(
     return merged_chapters
 
 
-class YtDlpMediaInfoExtractor:
+class YtDLPMediaInfoExtractor:
     def __init__(self, temp_dir: Path, extra_opts: typing.Dict[str, typing.Any]):
         self.temp_dir = temp_dir
         self.extra_opts = extra_opts
