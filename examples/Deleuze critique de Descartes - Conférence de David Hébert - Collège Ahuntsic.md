@@ -1,3 +1,9 @@
+```bash
+yt2doc --version
+# 0.3.3
+yt2doc --video https://www.youtube.com/watch\?v\=HzMuo4aDJG4 --whisper-backend whisper_cpp --whisper-cpp-executable $HOME/Development/whisper.cpp/main --whisper-cpp-model $HOME/Development/whisper.cpp/models/ggml-large-v3-turbo.bin --sat-model sat-12l --segment-unchaptered --llm-model phi4 --add-table-of-contents --timestamp-paragraphs -o examples
+```
+
 # Deleuze critique de Descartes - Conférence de David Hébert - Collège Ahuntsic
 
 https://www.youtube.com/watch?v=HzMuo4aDJG4
