@@ -115,7 +115,7 @@ yt2doc --playlist <playlist-url> -o some_dir
 yt2doc --video <video-url> --segment-unchaptered --llm-model <model-name>
 ```
 
-Among smaller size models, `gemma2:9b`, `llama3.1:8b`, and `qwen 2.5:7b` work reasonably well.
+Among smaller size models, `gemma2:9b`, `llama3.1:8b`, `qwen 2.5:7b`, and `phi4:14b` work reasonably well.
 
 By default, yt2doc talks to Ollama at `http://localhost:11434/v1` to segment the text by topic. You can run yt2doc to interact with Ollama at a different address or port, a different (OpenAI-compatible) LLM server (e.g. [vLLM](https://github.com/vllm-project/vllm), [mistral.rs](https://github.com/EricLBuehler/mistral.rs)), or even OpenAI itself, by
 
