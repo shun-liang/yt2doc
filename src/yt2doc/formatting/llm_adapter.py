@@ -3,7 +3,7 @@ import typing
 
 from instructor import Instructor
 from instructor.exceptions import InstructorRetryException
-from pydantic import BaseModel, AfterValidator
+from pydantic import BaseModel, AfterValidator, Field
 
 logger = logging.getLogger(__name__)
 
@@ -83,18 +83,24 @@ class LLMAdapter:
     def generate_title_for_paragraphs(
         self, paragraphs: typing.List[typing.List[str]]
     ) -> str:
+        class ChapterSummary(BaseModel):
+            detected_language: str = Field(
+                description="The language code of the text that you are generating a title for. The title must be generated in this same language"
+            )
+            title: str
+
         text = "\n\n".join(["".join(p) for p in paragraphs])
         try:
-            title = self.llm_client.chat.completions.create(
+            summary = self.llm_client.chat.completions.create(
                 model=self.llm_model,
-                response_model=str,
+                response_model=ChapterSummary,
                 messages=[
                     {
                         "role": "system",
                         "content": """
-                            Please generate a short title for the following text.
-
-                            Be VERY SUCCINCT. No more than 6 words.
+                            Generate a short title for the following text that is
+                            * very SUCCINCT
+                            * in the SAME LANGUAGE as the text.
                         """,
                     },
                     {
@@ -113,4 +119,4 @@ class LLMAdapter:
                 f"Failed to title for topic segment from the LLM. Exception: {e}"
             )
             return "Failed to generate title"
-        return title
+        return summary.title
